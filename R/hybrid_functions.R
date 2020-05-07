@@ -56,7 +56,7 @@ ConvertToGRanges <- function(hybrids.dt, arm = c("L", "R")) {
   } else if(arm == "R") {
 
     R.dt <- hybrids.dt[, grep("^L_", names(hybrids.dt), invert = TRUE), with = FALSE]
-    setnames(R.dt, names(R.dt), gsub("^R_", "", names(L.dt)))
+    setnames(R.dt, names(R.dt), gsub("^R_", "", names(R.dt)))
     R.gr <- GenomicRanges::GRanges(R.dt)
 
     return(R.gr)

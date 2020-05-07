@@ -120,3 +120,24 @@ ReorientHybrids <- function(hybrids.dt) {
   return(reoriented.dt)
 
 }
+
+
+#' Title
+#'
+#' @param hybrids.dt
+#'
+#' @return
+#'
+#' @import data.table
+#' @export
+
+RemovePCRDuplicates <- function(hybrids.dt) {
+
+  hybrids.dt[, rbc := sub(".*\\:", "", name)]
+  unique.hybrids.dt <- unique(hybrids.dt, by = c("L_seqnames", "L_start", "L_end", "R_seqnames", "R_start", "R_end", "rbc", "orientation"))
+  # unique.hybrids.dt <- unique(hybrids.dt, by = c("L_seqnames", "L_start", "R_seqnames", "R_start", "rbc", "orientation"))
+
+  message("PCR duplication ratio: ", round(nrow(hybrids.dt)/nrow(unique.hybrids.dt), 2))
+  return(unique.hybrids.dt)
+
+}
