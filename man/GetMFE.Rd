@@ -4,7 +4,7 @@
 \alias{GetMFE}
 \title{Title}
 \usage{
-GetMFE(sequence1, sequence2)
+GetMFE(L_sequence, R_sequence)
 }
 \arguments{
 \item{sequence2}{}

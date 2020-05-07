@@ -57,9 +57,9 @@ ShuffleSequence <- function(sequence, klet = 2, seed = 42) {
 #' @return
 #' @export
 
-GetMFE <- function(sequence1, sequence2) {
+GetMFE <- function(L_sequence, R_sequence) {
 
-  input <- paste0(sequence1, "\n", sequence2)
+  input <- paste0(L_sequence, "\n", R_sequence)
   rnaduplex <- system("RNAduplex --noLP", input = input, intern = TRUE)
 
   rnaduplex <- gsub("\\s+", "_", rnaduplex)
