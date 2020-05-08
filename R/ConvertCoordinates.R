@@ -98,7 +98,7 @@ ExportBED <- function(g.grl, hybrids.dt, filename) {
   bed.dt[is.na(cluster), cluster := "None"]
 
   colour.dt <- data.table(cluster = 1:max(hybrids.dt$cluster, na.rm = TRUE),
-                          colour = RColorBrewer::bbrewer.pal(9, "Set1"))
+                          colour = RColorBrewer::brewer.pal(9, "Set1"))
   black.dt <- data.table(cluster = "None",
                          colour = "#000001")
   colour.dt <- rbind(colour.dt, black.dt)
