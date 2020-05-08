@@ -77,7 +77,7 @@ ClusterHybrids <- function(hybrids.dt, percent_overlap = 0.5) {
   # Get connected nodes (i.e. clusters)
   clusters <- RBGL::connectedComp(NEL) # https://support.bioconductor.org/p/85092/
   # table(elementNROWS(clusters))
-  clusters.dt <- data.table(cluster = rep(names(clusters), elementNROWS(clusters)),
+  clusters.dt <- data.table(cluster = rep(names(clusters), S4Vectors::elementNROWS(clusters)),
                             name = unlist(clusters))
   setkey(clusters.dt, name)
 
