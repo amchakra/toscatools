@@ -66,7 +66,7 @@ ConvertCoordinates <- function(seq.dt, genes.gr, cores) {
     return(c(L.gr, R.gr))
 
   })
-  stopCluster(cl)
+  parallel::stopCluster(cl)
 
   g.grl <- sort(GenomicRanges::GRangesList(g.grl))
   return(g.grl)
