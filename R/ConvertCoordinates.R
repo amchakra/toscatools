@@ -30,12 +30,12 @@ ConvertCoordinates <- function(seq.dt, genes.gr, cores) {
       R.start = seq.dt[i]$R_start + gene.start - 1
       R.end = seq.dt[i]$R_end + gene.start - 1
 
-      L.gr <- GenomicRanges::GRanges(seqnames = as.character(seqnames(gene.gr)),
+      L.gr <- GenomicRanges::GRanges(seqnames = as.character(GenomicRanges::seqnames(gene.gr)),
                       ranges = IRanges::IRanges(start = L.start,
                                        end = L.end),
                       strand = "+")
 
-      R.gr <- GenomicRanges::GRanges(seqnames = as.character(seqnames(gene.gr)),
+      R.gr <- GenomicRanges::GRanges(seqnames = as.character(GenomicRanges::seqnames(gene.gr)),
                       ranges = IRanges(start = R.start,
                                        end = R.end),
                       strand = "+")
@@ -48,12 +48,12 @@ ConvertCoordinates <- function(seq.dt, genes.gr, cores) {
       R.start <- gene.start - seq.dt[i]$R_start
       R.end <- gene.start - seq.dt[i]$R_end
 
-      L.gr <- GenomicRanges::GRanges(seqnames = as.character(seqnames(gene.gr)),
+      L.gr <- GenomicRanges::GRanges(seqnames = as.character(GenomicRanges::seqnames(gene.gr)),
                       ranges = IRanges::IRanges(start = L.end,
                                        end = L.start),
                       strand = "-")
 
-      R.gr <- GenomicRanges::GRanges(seqnames = as.character(seqnames(gene.gr)),
+      R.gr <- GenomicRanges::GRanges(seqnames = as.character(GenomicRanges::seqnames(gene.gr)),
                       ranges = IRanges::IRanges(start = R.end,
                                        end = R.start),
                       strand = "-")
