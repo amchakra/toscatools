@@ -36,7 +36,7 @@ ConvertCoordinates <- function(seq.dt, genes.gr, cores) {
                       strand = "+")
 
       R.gr <- GenomicRanges::GRanges(seqnames = as.character(GenomicRanges::seqnames(gene.gr)),
-                      ranges = IRanges(start = R.start,
+                      ranges = IRanges::IRanges(start = R.start,
                                        end = R.end),
                       strand = "+")
 
