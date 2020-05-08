@@ -92,12 +92,12 @@ ExportBED <- function(g.grl, hybrids.dt, filename) {
   bed.dt <- fread(filename,
                   col.names = c("chrom",	"chromStart", "chromEnd", "name", "score", "strand", "thickStart", "thickEnd", "itemRgb", "blockCount", "blockSizes", "blockStarts"))
 
-  bed.dt[, `:=` (name = seq.dt$name,
-                 # score = seq.dt$cluster,
-                 cluster = as.character(seq.dt$cluster))]
+  bed.dt[, `:=` (name = hybrids.dt$name,
+                 # score = hybrids.dt$cluster,
+                 cluster = as.character(hybrids.dt$cluster))]
   bed.dt[is.na(cluster), cluster := "None"]
 
-  colour.dt <- data.table(cluster = 1:max(seq.dt$cluster, na.rm = TRUE),
+  colour.dt <- data.table(cluster = 1:max(hybrids.dt$cluster, na.rm = TRUE),
                           colour = RColorBrewer::bbrewer.pal(9, "Set1"))
   black.dt <- data.table(cluster = "None",
                          colour = "#000001")
