@@ -2,8 +2,10 @@
 
 export(.slurm_GetMFE)
 export(ClusterHybrids)
+export(ConvertCoordinates)
 export(ConvertToDataTable)
 export(ConvertToGRanges)
+export(ExportBED)
 export(ExtractChimericReads)
 export(ExtractGenomicReads)
 export(ExtractHybrids)
