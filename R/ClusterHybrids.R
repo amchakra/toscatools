@@ -90,3 +90,35 @@ ClusterHybrids <- function(hybrids.dt, percent_overlap = 0.5) {
   return(hybrids.dt)
 
 }
+
+#' Title
+#'
+#' @param hybrids.dt
+#'
+#' @return
+#' @import data.table
+#' @export
+
+CollapseClusters <- function(hybrids.dt) {
+
+  clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)]
+  clusters.dt[, `:=` (L_cluster_start = min(L_start),
+                      L_cluster_end = max(L_end),
+                      R_cluster_start = min(R_start),
+                      R_cluster_end = max(R_end),
+                      cluster_mfe = mean(mfe)),
+              by = .(L_seqnames, cluster)]
+
+  clusters.dt <- unique(clusters.dt[, .(L_seqnames, L_cluster_start, L_cluster_end, L_strand,
+                                        R_seqnames, R_cluster_start, R_cluster_end, R_strand,
+                                        cluster, cluster_mfe)])
+
+  setnames(clusters.dt,
+           c("L_cluster_start", "L_cluster_end", "R_cluster_start", "R_cluster_end", "cluster_mfe"),
+           c("L_start", "L_end", "R_start", "R_end", "mfe"))
+
+  clusters.dt[, name := paste0("C", 1:.N)]
+
+  return(clusters.dt)
+
+}

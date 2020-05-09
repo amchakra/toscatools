@@ -95,7 +95,14 @@ ExportBED <- function(g.grl, hybrids.dt, filename, sam_tag = TRUE) {
 
   # TODO need to generalise. Currently needs MFE
   bed.dt$name <- hybrids.dt$name
-  if(sam_tag == TRUE) bed.dt$name <- paste0(bed.dt$name, "_", hybrids.dt$cluster, "_", hybrids.dt$orientation, "_", hybrids.dt$mfe)
+  if(sam_tag == TRUE) {
+
+    if("cluster" %in% names(hybrids.dt)) bed.dt$name <- paste0(bed.dt$name, "_", hybrids.dt$cluster)
+    if("orientation" %in% names(hybrids.dt)) bed.dt$name <- paste0(bed.dt$name, "_", hybrids.dt$orientation)
+    if("mfe" %in% names(hybrids.dt)) bed.dt$name <- paste0(bed.dt$name, "_", hybrids.dt$mfe)
+
+  }
+    # bed.dt$name <- paste0(bed.dt$name, "_", hybrids.dt$cluster, "_", hybrids.dt$orientation, "_", hybrids.dt$mfe)
 
   # bed.dt[, `:=` (name = hybrids.dt$name,
   #                # score = hybrids.dt$cluster,
