@@ -79,36 +79,42 @@ ConvertCoordinates <- function(seq.dt, genes.gr, cores) {
 #' @param g.grl
 #' @param hybrids.dt
 #' @param filename
+#' @param sam_tag
 #'
 #' @return
 #'
 #' @import data.table
 #' @export
 
-ExportBED <- function(g.grl, hybrids.dt, filename) {
+ExportBED <- function(g.grl, hybrids.dt, filename, sam_tag = TRUE) {
 
   rtracklayer::export.bed(g.grl, filename)
 
   bed.dt <- fread(filename,
                   col.names = c("chrom",	"chromStart", "chromEnd", "name", "score", "strand", "thickStart", "thickEnd", "itemRgb", "blockCount", "blockSizes", "blockStarts"))
 
-  bed.dt[, `:=` (name = hybrids.dt$name,
-                 # score = hybrids.dt$cluster,
-                 cluster = as.character(hybrids.dt$cluster))]
-  bed.dt[is.na(cluster), cluster := "None"]
+  # TODO need to generalise. Currently needs MFE
+  bed.dt$name <- hybrids.dt$name
+  if(sam_tag == TRUE) bed.dt$name <- paste0(bed.dt$name, "_", hybrids.dt$cluster, "_", hybrids.dt$orientation, "_", hybrids.dt$mfe)
 
-  colour.dt <- data.table(cluster = 1:max(hybrids.dt$cluster, na.rm = TRUE),
-                          colour = RColorBrewer::brewer.pal(9, "Set1"))
-  black.dt <- data.table(cluster = "None",
-                         colour = "#000001")
-  colour.dt <- rbind(colour.dt, black.dt)
-  colour.dt <- cbind(colour.dt, t(col2rgb(colour.dt$colour)))
-  colour.dt[, rgb := paste0(red, ",", green, ",", blue)]
-  # colour.dt[cluster == "None", rgb := NA]
+  # bed.dt[, `:=` (name = hybrids.dt$name,
+  #                # score = hybrids.dt$cluster,
+  #                cluster = as.character(hybrids.dt$cluster))]
+  # bed.dt[is.na(cluster), cluster := "None"]
+  #
+  # colour.dt <- data.table(cluster = 1:max(hybrids.dt$cluster, na.rm = TRUE),
+  #                         colour = RColorBrewer::brewer.pal(9, "Set1"))
+  # black.dt <- data.table(cluster = "None",
+  #                        colour = "#000001")
+  # colour.dt <- rbind(colour.dt, black.dt)
+  # colour.dt <- cbind(colour.dt, t(col2rgb(colour.dt$colour)))
+  # colour.dt[, rgb := paste0(red, ",", green, ",", blue)]
+  # # colour.dt[cluster == "None", rgb := NA]
+  #
+  # bed.dt <- merge(bed.dt, colour.dt[, .(cluster, rgb)], by = "cluster")
+  # bed.dt[, itemRgb := rgb]
+  # bed.dt[, `:=` (cluster = NULL, rgb = NULL)]
 
-  bed.dt <- merge(bed.dt, colour.dt[, .(cluster, rgb)], by = "cluster")
-  bed.dt[, itemRgb := rgb]
-  bed.dt[, `:=` (cluster = NULL, rgb = NULL)]
   fwrite(bed.dt, file = filename, sep = "\t", quote = FALSE, col.names = FALSE)
 
 }

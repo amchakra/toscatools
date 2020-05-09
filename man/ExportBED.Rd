@@ -4,10 +4,10 @@
 \alias{ExportBED}
 \title{Title}
 \usage{
-ExportBED(g.grl, hybrids.dt, filename)
+ExportBED(g.grl, hybrids.dt, filename, sam_tag = TRUE)
 }
 \arguments{
-\item{filename}{}
+\item{sam_tag}{}
 }
 \value{
 
