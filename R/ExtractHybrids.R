@@ -133,7 +133,8 @@ ReorientHybrids <- function(hybrids.dt) {
 
 RemovePCRDuplicates <- function(hybrids.dt) {
 
-  hybrids.dt[, rbc := sub(".*\\:", "", name)]
+  # hybrids.dt[, rbc := sub(".*\\:", "", name)]
+  hybrids.dt[, rbc := ifelse(grepl("_", name), sub(".*\\:", "", name), sub(".*\\:", "", name))] # Added "_" option for UMI tools
   unique.hybrids.dt <- unique(hybrids.dt, by = c("L_seqnames", "L_start", "L_end", "R_seqnames", "R_start", "R_end", "rbc", "orientation"))
   # unique.hybrids.dt <- unique(hybrids.dt, by = c("L_seqnames", "L_start", "R_seqnames", "R_start", "rbc", "orientation"))
 
