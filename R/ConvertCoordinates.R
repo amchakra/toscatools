@@ -120,7 +120,7 @@ ExportGenomicBED <- function(seq.dt, genes.gr, filename, sam_tag = TRUE) {
                    thickEnd = R.end,
                    itemRgb = 0,
                    blockCount = 2,
-                   blockSizes = paste0(L.end - L.start - 1, ",", R.end - R.start - 1),
+                   blockSizes = paste0(L.end - L.start + 1, ",", R.end - R.start + 1),
                    blockStarts = paste0("0,", R.start - L.start)),
            by = name]
 
