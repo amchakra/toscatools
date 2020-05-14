@@ -134,7 +134,7 @@ ExportGenomicBED <- function(seq.dt, genes.gr, filename, sam_tag = TRUE) {
 
   }
 
-  fwrite(bed.dt, file = filename, sep = "\t", quote = FALSE, col.names = FALSE)
+  fwrite(bed.dt, file = filename, sep = "\t", quote = FALSE, col.names = FALSE, scipen = 999) # Needed to add scipen as otherwise some coordinates end up scientific
 
 }
 
