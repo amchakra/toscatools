@@ -38,6 +38,8 @@ GetSequenceDS <- function(gr, fasta) {
 #' @return
 #' @export
 
+# Should only do this for intragenic?
+
 GetSJMotifs <- function(hybrids.dt, genome.dt) {
 
   genomic.dt <- hybrids.dt[orientation == "genomic"]

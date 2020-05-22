@@ -8,8 +8,7 @@
 #'
 #' @import data.table
 #' @export
-#'
-#' @examples
+
 
 ExtractHybrids <- function(aligned.bam, chimeric.junction) {
 
@@ -87,6 +86,75 @@ ExtractHybrids <- function(aligned.bam, chimeric.junction) {
   aligned.dt[, orientation := "genomic"]
   chimeric.dt[, orientation := "reverse"]
   hybrids.dt <- rbindlist(list(aligned.dt, chimeric.dt), fill = TRUE)
+
+  return(hybrids.dt)
+
+}
+
+
+#' Title
+#'
+#' @param aligned.bam
+#'
+#' @return
+#'
+#' @import data.table
+#' @export
+#'
+
+ExtractHybridsWithinBAM <- function(aligned.bam) {
+
+  ga <- GenomicAlignments::readGAlignments(aligned.bam, use.names = TRUE, param = Rsamtools::ScanBamParam(what = "flag"))
+
+  # 0 = mapped positive strand
+  # 16 = mapped negative strand
+  # 2046 = chimeric second half positive strand
+  # 2064 = chimeric second half negative strand
+
+  # Reverse orientation reads
+  chimeric.reads <- names(ga)[mcols(ga)$flag == 2048]
+  chimeric.gr <- GenomicAlignments::granges(ga[names(ga) %in% chimeric.reads])
+  chimeric.grl <- split(chimeric.gr, names(chimeric.gr))
+  chimeric.gr <- unlist(chimeric.grl)
+  chimeric.gr$name <- names(chimeric.gr)
+  names(chimeric.gr) <- NULL
+
+  L.chimeric.gr <- chimeric.gr[c(TRUE, FALSE)]
+  R.chimeric.gr <- chimeric.gr[c(FALSE, TRUE)]
+
+  chimeric.grl <- GenomicRanges::GRangesList(L = L.chimeric.gr, R = R.chimeric.gr)
+  chimeric.dt <- ConvertToDataTable(chimeric.grl)
+  setkey(chimeric.dt, name)
+
+  # Identify chimeric overlapping
+  ol <- GenomicRanges::pintersect(chimeric.grl$L, chimeric.grl$R)
+  ol.dt <- as.data.table(ol)[, .(name, hit)]
+  setnames(ol.dt, "hit", "overlapping_hybrid")
+  setkey(ol.dt, name)
+
+  chimeric.dt <- merge(chimeric.dt, ol.dt, by = "name", all.x = TRUE)
+
+  # Genomic orientation reads
+  aligned.ga <- ga[!names(ga) %in% chimeric.reads]
+  aligned.ga <- ga[GenomicAlignments::njunc(ga) == 1] # Ignore triplexes etc.
+
+  aligned.grl <- GenomicAlignments::grglist(aligned.ga)
+  aligned.gr <- unlist(aligned.grl)
+  aligned.gr$name <- names(aligned.gr)
+  names(aligned.gr) <- NULL
+
+  L.aligned.gr <- aligned.gr[c(TRUE, FALSE)]
+  R.aligned.gr <- aligned.gr[c(FALSE, TRUE)]
+
+  aligned.grl <- GenomicRanges::GRangesList(L = L.aligned.gr, R = R.aligned.gr)
+  aligned.dt <- ConvertToDataTable(aligned.grl)
+  setkey(aligned.dt, name)
+
+  # Now combine and output
+  aligned.dt[, orientation := "genomic"]
+  chimeric.dt[, orientation := "reverse"]
+  hybrids.dt <- rbindlist(list(aligned.dt, chimeric.dt), fill = TRUE)
+  hybrids.dt <- hybrids.dt[L_strand == "+" & R_strand == "+"] # Both have to be positive strand
 
   return(hybrids.dt)
 
