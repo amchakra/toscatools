@@ -112,15 +112,25 @@ ExtractHybridsWithinBAM <- function(aligned.bam) {
   # 2064 = chimeric second half negative strand
 
   # Reverse orientation reads
-  chimeric.reads <- names(ga)[S4Vectors::mcols(ga)$flag == 2048]
-  chimeric.gr <- GenomicAlignments::granges(ga[names(ga) %in% chimeric.reads])
-  chimeric.grl <- split(chimeric.gr, names(chimeric.gr))
-  chimeric.gr <- unlist(chimeric.grl)
+  R.chimeric.gr <- GenomicAlignments::granges(ga[S4Vectors::mcols(ga)$flag %in% c(2048, 2064)])
+  L.chimeric.gr <- GenomicAlignments::granges(ga[S4Vectors::mcols(ga)$flag %in% c(0, 16)])
+  L.chimeric.gr <- L.chimeric.gr[names(L.chimeric.gr) %in% names(R.chimeric.gr)]
+
+  # UMI tools dedup doesn't collapse the supplementary alignment no need to remove missing ones
+  missing <- names(R.chimeric.gr)[!names(R.chimeric.gr) %in% names(L.chimeric.gr)]
+  R.chimeric.gr <- R.chimeric.gr[names(R.chimeric.gr) %in% names(L.chimeric.gr)]
+
+  chimeric.gr <- c(L.chimeric.gr, R.chimeric.gr)
+  dupl <- duplicated(names(chimeric.gr)) # Check there is one of each
+  stopifnot(sum(dupl == FALSE) == sum(dupl == TRUE))
+
+  chimeric.gr <- chimeric.gr[order(names(chimeric.gr))]
   chimeric.gr$name <- names(chimeric.gr)
   names(chimeric.gr) <- NULL
 
   L.chimeric.gr <- chimeric.gr[c(TRUE, FALSE)]
   R.chimeric.gr <- chimeric.gr[c(FALSE, TRUE)]
+  stopifnot(all(L.chimeric.gr$name == R.chimeric.gr$name)) # Check names match up
 
   chimeric.grl <- GenomicRanges::GRangesList(L = L.chimeric.gr, R = R.chimeric.gr)
   chimeric.dt <- ConvertToDataTable(chimeric.grl)
@@ -135,6 +145,7 @@ ExtractHybridsWithinBAM <- function(aligned.bam) {
   chimeric.dt <- merge(chimeric.dt, ol.dt, by = "name", all.x = TRUE)
 
   # Genomic orientation reads
+  chimeric.reads <- names(ga)[S4Vectors::mcols(ga)$flag %in% c(2048, 2064)]
   aligned.ga <- ga[!names(ga) %in% chimeric.reads]
   aligned.ga <- ga[GenomicAlignments::njunc(ga) == 1] # Ignore triplexes etc.
 
