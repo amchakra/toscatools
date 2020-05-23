@@ -112,7 +112,7 @@ ExtractHybridsWithinBAM <- function(aligned.bam) {
   # 2064 = chimeric second half negative strand
 
   # Reverse orientation reads
-  chimeric.reads <- names(ga)[mcols(ga)$flag == 2048]
+  chimeric.reads <- names(ga)[S4Vectors:mcols(ga)$flag == 2048]
   chimeric.gr <- GenomicAlignments::granges(ga[names(ga) %in% chimeric.reads])
   chimeric.grl <- split(chimeric.gr, names(chimeric.gr))
   chimeric.gr <- unlist(chimeric.grl)
