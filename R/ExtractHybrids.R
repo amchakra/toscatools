@@ -111,26 +111,42 @@ ExtractHybridsWithinBAM <- function(aligned.bam) {
   # 2046 = chimeric second half positive strand
   # 2064 = chimeric second half negative strand
 
+  # ==========
   # Reverse orientation reads
-  R.chimeric.gr <- GenomicAlignments::granges(ga[S4Vectors::mcols(ga)$flag %in% c(2048, 2064)])
-  L.chimeric.gr <- GenomicAlignments::granges(ga[S4Vectors::mcols(ga)$flag %in% c(0, 16)])
-  L.chimeric.gr <- L.chimeric.gr[names(L.chimeric.gr) %in% names(R.chimeric.gr)]
+  # ==========
 
-  # UMI tools dedup doesn't collapse the supplementary alignment no need to remove missing ones
-  missing <- names(R.chimeric.gr)[!names(R.chimeric.gr) %in% names(L.chimeric.gr)]
-  R.chimeric.gr <- R.chimeric.gr[names(R.chimeric.gr) %in% names(L.chimeric.gr)]
+  R.chimeric.ga <- ga[S4Vectors::mcols(ga)$flag %in% c(2048, 2064)]
+  R.chimeric.ga <- R.chimeric.ga[GenomicAlignments::njunc(R.chimeric.ga) == 0] # Remove SJ in one arm
+  L.chimeric.ga <- ga[S4Vectors::mcols(ga)$flag %in% c(0, 16)]
+  L.chimeric.ga <- L.chimeric.ga[names(L.chimeric.ga) %in% names(R.chimeric.ga)]
+  L.chimeric.ga <- L.chimeric.ga[GenomicAlignments::njunc(L.chimeric.ga) == 0] # Remove SJ in other arm
 
-  chimeric.gr <- c(L.chimeric.gr, R.chimeric.gr)
-  dupl <- duplicated(names(chimeric.gr)) # Check there is one of each
-  stopifnot(sum(dupl == FALSE) == sum(dupl == TRUE))
+  # UMI tools dedup doesn't collapse the supplementary alignment so need to remove missing ones
+  # missing <- names(R.chimeric.gr)[!names(R.chimeric.gr) %in% names(L.chimeric.gr)]
+  # Also need to do this to filter SJ in one arm or other
+  R.chimeric.ga <- R.chimeric.ga[names(R.chimeric.ga) %in% names(L.chimeric.ga)]
 
-  chimeric.gr <- chimeric.gr[order(names(chimeric.gr))]
-  chimeric.gr$name <- names(chimeric.gr)
-  names(chimeric.gr) <- NULL
+  # Sort and check they match up
+  L.chimeric.ga <- L.chimeric.ga[sort(names(L.chimeric.ga))]
+  R.chimeric.ga <- R.chimeric.ga[sort(names(R.chimeric.ga))]
 
-  L.chimeric.gr <- chimeric.gr[c(TRUE, FALSE)]
-  R.chimeric.gr <- chimeric.gr[c(FALSE, TRUE)]
-  stopifnot(all(L.chimeric.gr$name == R.chimeric.gr$name)) # Check names match up
+  stopifnot(all(names(L.chimeric.ga) == names(R.chimeric.ga)))
+
+  # Convert to GRanges
+  L.chimeric.gr <- GenomicAlignments::granges(L.chimeric.ga)
+  L.chimeric.gr$name <- names(L.chimeric.gr)
+  names(L.chimeric.gr) <- NULL
+  L.chimeric.gr$q_side <- "L"
+
+  R.chimeric.gr <- GenomicAlignments::granges(R.chimeric.ga)
+  R.chimeric.gr$name <- names(R.chimeric.gr)
+  names(R.chimeric.gr) <- NULL
+  R.chimeric.gr$q_side <- "R"
+
+  # Merge and convert to data.table
+  # chimeric.gr <- c(L.chimeric.gr, R.chimeric.gr)
+  # dupl <- duplicated(chimeric.gr$name) # Check there is one of each
+  # stopifnot(sum(dupl == FALSE) == sum(dupl == TRUE))
 
   chimeric.grl <- GenomicRanges::GRangesList(L = L.chimeric.gr, R = R.chimeric.gr)
   chimeric.dt <- ConvertToDataTable(chimeric.grl)
@@ -144,7 +160,10 @@ ExtractHybridsWithinBAM <- function(aligned.bam) {
 
   chimeric.dt <- merge(chimeric.dt, ol.dt, by = "name", all.x = TRUE)
 
+  # ==========
   # Genomic orientation reads
+  # ==========
+
   chimeric.reads <- names(ga)[S4Vectors::mcols(ga)$flag %in% c(2048, 2064)]
   aligned.ga <- ga[!names(ga) %in% chimeric.reads]
   aligned.ga <- ga[GenomicAlignments::njunc(ga) == 1] # Ignore triplexes etc.
@@ -156,6 +175,9 @@ ExtractHybridsWithinBAM <- function(aligned.bam) {
 
   L.aligned.gr <- aligned.gr[c(TRUE, FALSE)]
   R.aligned.gr <- aligned.gr[c(FALSE, TRUE)]
+
+  L.aligned.gr$q_side <- "L"
+  R.aligned.gr$q_side <- "R"
 
   aligned.grl <- GenomicRanges::GRangesList(L = L.aligned.gr, R = R.aligned.gr)
   aligned.dt <- ConvertToDataTable(aligned.grl)
@@ -213,7 +235,7 @@ ReorientHybrids <- function(hybrids.dt) {
 RemovePCRDuplicates <- function(hybrids.dt) {
 
   # hybrids.dt[, rbc := sub(".*\\:", "", name)]
-  hybrids.dt[, rbc := ifelse(grepl("_", name), sub(".*\\:", "", name), sub(".*\\:", "", name))] # Added "_" option for UMI tools
+  hybrids.dt[, rbc := ifelse(grepl("_", name), sub(".*\\_", "", name), sub(".*\\:", "", name))] # Added "_" option for UMI tools
   unique.hybrids.dt <- unique(hybrids.dt, by = c("L_seqnames", "L_start", "L_end", "R_seqnames", "R_start", "R_end", "rbc", "orientation"))
   # unique.hybrids.dt <- unique(hybrids.dt, by = c("L_seqnames", "L_start", "R_seqnames", "R_start", "rbc", "orientation"))
 
