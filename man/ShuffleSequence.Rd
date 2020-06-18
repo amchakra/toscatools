@@ -4,7 +4,7 @@
 \alias{ShuffleSequence}
 \title{Title}
 \usage{
-ShuffleSequence(sequence, klet = 2, seed = 42)
+ShuffleSequence(sequence, number = 1, klet = 2, seed = 42)
 }
 \arguments{
 \item{seed}{}

@@ -43,9 +43,9 @@ GetSequence <- function(hybrids.dt, genome.dt) {
 #' @return
 #' @export
 
-ShuffleSequence <- function(sequence, klet = 2, seed = 42) {
+ShuffleSequence <- function(sequence, number = 1, klet = 2, seed = 42) {
 
-  system(paste0("uShuffle -seed ", seed, " -k ", klet, " -n 1 -s ", sequence), intern = TRUE)
+  system(paste0("uShuffle -seed ", seed, " -k ", klet, " -n ", number, " -s ", sequence), intern = TRUE)
 
 }
 
