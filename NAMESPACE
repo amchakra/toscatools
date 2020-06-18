@@ -3,6 +3,7 @@
 export(.slurm_GetMFE)
 export(ClusterHybrids)
 export(CollapseClusters)
+export(CollapseClustersOld)
 export(ConvertCoordinates)
 export(ConvertToDataTable)
 export(ConvertToGRanges)

@@ -99,7 +99,7 @@ ClusterHybrids <- function(hybrids.dt, percent_overlap = 0.5) {
 #' @import data.table
 #' @export
 
-CollapseClusters <- function(hybrids.dt) {
+CollapseClustersOld <- function(hybrids.dt) {
 
   clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)]
   clusters.dt[, `:=` (L_cluster_start = median(L_start),
@@ -116,6 +116,38 @@ CollapseClusters <- function(hybrids.dt) {
   setnames(clusters.dt,
            c("L_cluster_start", "L_cluster_end", "R_cluster_start", "R_cluster_end", "cluster_mfe"),
            c("L_start", "L_end", "R_start", "R_end", "mfe"))
+
+  clusters.dt[, name := paste0("C", 1:.N)]
+
+  return(clusters.dt)
+
+}
+
+#' Title
+#'
+#' @param hybrids.dt
+#'
+#' @return
+#' @import data.table
+#' @export
+
+CollapseClusters <- function(hybrids.dt) {
+
+  clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)]
+  clusters.dt[, `:=` (L_cluster_start = median(L_start),
+                      L_cluster_end = median(L_end),
+                      R_cluster_start = median(R_start),
+                      R_cluster_end = median(R_end)),
+              by = .(L_seqnames, cluster)]
+
+  clusters.dt[, count := .N, by = .(L_seqnames, cluster)]
+  clusters.dt <- unique(clusters.dt[, .(L_seqnames, L_cluster_start, L_cluster_end, L_strand,
+                                        R_seqnames, R_cluster_start, R_cluster_end, R_strand,
+                                        cluster, count)])
+
+  setnames(clusters.dt,
+           c("L_cluster_start", "L_cluster_end", "R_cluster_start", "R_cluster_end", "cluster_mfe"),
+           c("L_start", "L_end", "R_start", "R_end", "count"))
 
   clusters.dt[, name := paste0("C", 1:.N)]
 
