@@ -102,10 +102,10 @@ ClusterHybrids <- function(hybrids.dt, percent_overlap = 0.5) {
 CollapseClusters <- function(hybrids.dt) {
 
   clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)]
-  clusters.dt[, `:=` (L_cluster_start = min(L_start),
-                      L_cluster_end = max(L_end),
-                      R_cluster_start = min(R_start),
-                      R_cluster_end = max(R_end),
+  clusters.dt[, `:=` (L_cluster_start = median(L_start),
+                      L_cluster_end = median(L_end),
+                      R_cluster_start = median(R_start),
+                      R_cluster_end = median(R_end),
                       cluster_mfe = mean(mfe)),
               by = .(L_seqnames, cluster)]
 
