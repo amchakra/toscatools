@@ -146,8 +146,8 @@ CollapseClusters <- function(hybrids.dt) {
                                         cluster, count)])
 
   setnames(clusters.dt,
-           c("L_cluster_start", "L_cluster_end", "R_cluster_start", "R_cluster_end", "cluster_mfe"),
-           c("L_start", "L_end", "R_start", "R_end", "count"))
+           c("L_cluster_start", "L_cluster_end", "R_cluster_start", "R_cluster_end"),
+           c("L_start", "L_end", "R_start", "R_end"))
 
   clusters.dt[, name := paste0("C", 1:.N)]
 
