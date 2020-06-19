@@ -4,7 +4,7 @@
 \alias{ExtractHybridsWithinBAM}
 \title{Title}
 \usage{
-ExtractHybridsWithinBAM(aligned.bam)
+ExtractHybridsWithinBAM(aligned.bam, remove.repeats = FALSE)
 }
 \arguments{
 \item{aligned.bam}{}
