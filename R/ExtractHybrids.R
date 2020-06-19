@@ -102,7 +102,7 @@ ExtractHybrids <- function(aligned.bam, chimeric.junction) {
 #' @export
 #'
 
-ExtractHybridsWithinBAM <- function(aligned.bam) {
+ExtractHybridsWithinBAM <- function(aligned.bam, remove.repeats = FALSE) {
 
   ga <- GenomicAlignments::readGAlignments(aligned.bam, use.names = TRUE, param = Rsamtools::ScanBamParam(what = c("flag", "seq")))
 
@@ -169,10 +169,14 @@ ExtractHybridsWithinBAM <- function(aligned.bam) {
   aligned.ga <- ga[GenomicAlignments::njunc(ga) == 1] # Ignore triplexes etc.
 
   # Add in filter
-  nuc <- c("A", "G", "C", "T")
-  filter <- sapply(paste0(expand.grid(nuc, nuc)$Var1, expand.grid(nuc, nuc)$Var2), function(x) paste0(rep(x, each = 5), collapse = ""))
-  repeats <- Biostrings::vcountPDict(Biostrings::PDict(filter), S4Vectors::mcols(aligned.ga)$seq, collapse = 2)
-  aligned.ga <- aligned.ga[repeats == 0]
+  if(remove.repeats == TRUE) {
+
+    nuc <- c("A", "G", "C", "T")
+    filter <- sapply(paste0(expand.grid(nuc, nuc)$Var1, expand.grid(nuc, nuc)$Var2), function(x) paste0(rep(x, each = 5), collapse = ""))
+    repeats <- Biostrings::vcountPDict(Biostrings::PDict(filter), S4Vectors::mcols(aligned.ga)$seq, collapse = 2)
+    aligned.ga <- aligned.ga[repeats == 0]
+
+  }
 
   aligned.grl <- GenomicAlignments::grglist(aligned.ga)
   aligned.gr <- unlist(aligned.grl)
