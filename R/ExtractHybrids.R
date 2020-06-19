@@ -104,7 +104,7 @@ ExtractHybrids <- function(aligned.bam, chimeric.junction) {
 
 ExtractHybridsWithinBAM <- function(aligned.bam) {
 
-  ga <- GenomicAlignments::readGAlignments(aligned.bam, use.names = TRUE, param = Rsamtools::ScanBamParam(what = "flag"))
+  ga <- GenomicAlignments::readGAlignments(aligned.bam, use.names = TRUE, param = Rsamtools::ScanBamParam(what = c("flag", "seq")))
 
   # 0 = mapped positive strand
   # 16 = mapped negative strand
@@ -167,6 +167,12 @@ ExtractHybridsWithinBAM <- function(aligned.bam) {
   chimeric.reads <- names(ga)[S4Vectors::mcols(ga)$flag %in% c(2048, 2064)]
   aligned.ga <- ga[!names(ga) %in% chimeric.reads]
   aligned.ga <- ga[GenomicAlignments::njunc(ga) == 1] # Ignore triplexes etc.
+
+  # Add in filter
+  nuc <- c("A", "G", "C", "T")
+  filter <- sapply(paste0(expand.grid(nuc, nuc)$Var1, expand.grid(nuc, nuc)$Var2), function(x) paste0(rep(x, each = 5), collapse = ""))
+  repeats <- Biostrings::vcountPDict(Biostrings::PDict(filter), S4Vectors::mcols(aligned.ga)$seq, collapse = 2)
+  aligned.ga <- aligned.ga[repeats == 0]
 
   aligned.grl <- GenomicAlignments::grglist(aligned.ga)
   aligned.gr <- unlist(aligned.grl)
