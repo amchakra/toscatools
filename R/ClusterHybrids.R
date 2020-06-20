@@ -134,10 +134,10 @@ CollapseClustersOld <- function(hybrids.dt) {
 CollapseClusters <- function(hybrids.dt) {
 
   clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)]
-  clusters.dt[, `:=` (L_cluster_start = median(L_start),
-                      L_cluster_end = median(L_end),
-                      R_cluster_start = median(R_start),
-                      R_cluster_end = median(R_end)),
+  clusters.dt[, `:=` (L_cluster_start = floor(median(L_start)),
+                      L_cluster_end = ceiling(median(L_end)),
+                      R_cluster_start = floor(median(R_start)),
+                      R_cluster_end = ceiling(median(R_end))),
               by = .(L_seqnames, cluster)]
 
   clusters.dt[, count := .N, by = .(L_seqnames, cluster)]
