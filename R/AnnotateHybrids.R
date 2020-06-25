@@ -14,7 +14,7 @@ AnnotateHybrids <- function(hybrids.dt, ref.gr) {
   setkey(hybrids.dt, name, id)
 
   L.gr <- ConvertToGRanges(hybrids.dt, arm = "L")
-  R.gr <- ConvertToGRanges(hybrids.dt, arm = "L")
+  R.gr <- ConvertToGRanges(hybrids.dt, arm = "R")
 
   L.gr <- AnnotateHybridArm(arm.gr = L.gr, ref.gr = ref.gr)
   R.gr <- AnnotateHybridArm(arm.gr = R.gr, ref.gr = ref.gr)
