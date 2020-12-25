@@ -154,3 +154,73 @@ CollapseClusters <- function(hybrids.dt) {
   return(clusters.dt)
 
 }
+
+#' Title
+#'
+#' @param hybrid.dt
+#' @param sample_size
+#' @param percent_overlap
+#' @param cores
+#'
+#' @return
+#' @import data.table
+#' @export
+#'
+#' @examples
+
+cluster_sampled_hybrids <- function(hybrid.dt, sample_size, percent_overlap, cores) {
+
+  hybrid.dt <- primavera::ReorientHybrids(hybrid.dt)
+
+  # Get arm overlaps
+  L.gr <- primavera::ConvertToGRanges(hybrid.dt, arm = "L")
+  R.gr <- primavera::ConvertToGRanges(hybrid.dt, arm = "R")
+
+  L.bed <- tempfile(tmpdir = getwd(), fileext = ".bed")
+  R.bed <- tempfile(tmpdir = getwd(), fileext = ".bed")
+
+  L.ol <- tempfile(tmpdir = getwd(), fileext = ".bed")
+  R.ol <- tempfile(tmpdir = getwd(), fileext = ".bed")
+
+  subsample <- sample(1:length(L.gr), sample_size)
+
+  rtracklayer::export.bed(sort(L.gr[subsample]), L.bed)
+  system(paste("bedtools intersect -sorted -wo -s -f", percent_overlap, "-F", percent_overlap, "-e", "-a", L.bed, "-b", L.bed, ">", L.ol))
+
+  rtracklayer::export.bed(sort(R.gr[subsample]), R.bed)
+  system(paste("bedtools intersect -sorted -wo -s -f", percent_overlap, "-F", percent_overlap, "-e", "-a", R.bed, "-b", R.bed, ">", R.ol))
+
+  # Get overlap graph
+  L.dt <- fread(L.ol, select = c(4, 10), col.names = c("q", "s"))
+  R.dt <- fread(R.ol, select = c(4, 10), col.names = c("q", "s"))
+
+  s <- unique(c(L.dt$s, R.dt$s))
+  s.list <- parallel::mclapply(s, function(x) {
+
+    return(c(L.dt[s == x]$q, R.dt[s == x]$q)[duplicated(c(L.dt[s == x]$q, R.dt[s == x]$q))])
+
+  }, mc.cores = cores)
+  names(s.list) <- s
+
+  NEL <- graph::graphNEL(nodes = as.character(s), edgeL = s.list, edgemode = "undirected")
+
+  # Get connected nodes (i.e. clusters)
+  clusters <- RBGL::connectedComp(NEL) # https://support.bioconductor.org/p/85092/
+  clusters.dt <- data.table(cluster = rep(names(clusters), S4Vectors::elementNROWS(clusters)),
+                            name = unlist(clusters))
+  setkey(clusters.dt, name)
+  stopifnot(any(!duplicated(clusters.dt$name))) # Make sure no hybrid is in more than one cluster
+
+  # Merge back
+  setkey(hybrid.dt, name)
+  clusters.dt <- hybrid.dt[clusters.dt]
+
+  # Delete temporary files
+  invisible(file.remove(L.bed))
+  invisible(file.remove(R.bed))
+  invisible(file.remove(L.ol))
+  invisible(file.remove(R.ol))
+
+  return(clusters.dt)
+
+}
