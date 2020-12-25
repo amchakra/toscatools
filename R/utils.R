@@ -5,6 +5,7 @@
 #'
 #' @return
 #' @export
+#' @import data.table
 #'
 #' @examples
 
