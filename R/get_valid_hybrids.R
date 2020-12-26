@@ -134,7 +134,7 @@ filter_valid_hybrids <- function(hybrids.dt) {
   all.hybrids.dt <- all.hybrids.dt[, .(query, orientation, type, hybrid_selection,
                                        L_seqnames, L_q_start, L_q_end, L_start, L_end, L_width, L_strand,
                                        R_seqnames, R_q_start, R_q_end, R_start, R_end, R_width, R_strand)]
-  setnames(all.hybrids.dt, c("query", "L_q_start", "L_q_end", "R_q_start", "R_q_end"), c("read", "L_read_start", "L_read_end", "R_read_start", "R_read_end"))
+  setnames(all.hybrids.dt, c("query", "L_q_start", "L_q_end", "R_q_start", "R_q_end"), c("name", "L_read_start", "L_read_end", "R_read_start", "R_read_end"))
 
   return(all.hybrids.dt)
 
