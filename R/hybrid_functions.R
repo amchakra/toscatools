@@ -9,7 +9,7 @@
 #' @import data.table
 #' @export
 
-ConvertToDataTable <- function(hybrids.grl) {
+convert_to_datatable <- function(hybrids.grl) {
 
   L.dt <- as.data.table(hybrids.grl$L)
   R.dt <- as.data.table(hybrids.grl$R)
@@ -43,7 +43,7 @@ ConvertToDataTable <- function(hybrids.grl) {
 #' @export
 
 
-ConvertToGRanges <- function(hybrids.dt, arm = c("L", "R")) {
+convert_to_granges <- function(hybrids.dt, arm = c("L", "R")) {
 
   if(arm == "L") {
 

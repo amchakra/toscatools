@@ -168,13 +168,13 @@ CollapseClusters <- function(hybrids.dt) {
 #'
 #' @examples
 
-cluster_sampled_hybrids <- function(hybrid.dt, sample_size, percent_overlap, cores) {
+cluster_hybrids <- function(hybrids.dt, sample_size = -1, percent_overlap = 0.75, cores = 8, verbose = FALSE) {
 
-  hybrid.dt <- primavera::ReorientHybrids(hybrid.dt)
+  hybrids.dt <- primavera::reorient_hybrids(hybrids.dt)
 
   # Get arm overlaps
-  L.gr <- primavera::ConvertToGRanges(hybrid.dt, arm = "L")
-  R.gr <- primavera::ConvertToGRanges(hybrid.dt, arm = "R")
+  L.gr <- primavera::convert_to_granges(hybrids.dt, arm = "L")
+  R.gr <- primavera::convert_to_granges(hybrids.dt, arm = "R")
 
   L.bed <- tempfile(tmpdir = getwd(), fileext = ".bed")
   R.bed <- tempfile(tmpdir = getwd(), fileext = ".bed")
@@ -182,19 +182,39 @@ cluster_sampled_hybrids <- function(hybrid.dt, sample_size, percent_overlap, cor
   L.ol <- tempfile(tmpdir = getwd(), fileext = ".bed")
   R.ol <- tempfile(tmpdir = getwd(), fileext = ".bed")
 
-  subsample <- sample(1:length(L.gr), sample_size)
+  if(sample_size == -1) {
+    subsample <- 1:length(L.gr)
+  } else {
+    subsample <- sample(1:length(L.gr), sample_size)
+  }
 
   rtracklayer::export.bed(sort(L.gr[subsample]), L.bed)
-  system(paste("bedtools intersect -sorted -wo -s -f", percent_overlap, "-F", percent_overlap, "-e", "-a", L.bed, "-b", L.bed, ">", L.ol))
+  cmd <- paste("bedtools intersect -sorted -wo -s -f", percent_overlap, "-F", percent_overlap, "-e", "-a", L.bed, "-b", L.bed, ">", L.ol)
+  if(verbose) message(cmd)
+  system(cmd)
 
   rtracklayer::export.bed(sort(R.gr[subsample]), R.bed)
-  system(paste("bedtools intersect -sorted -wo -s -f", percent_overlap, "-F", percent_overlap, "-e", "-a", R.bed, "-b", R.bed, ">", R.ol))
+  cmd <- paste("bedtools intersect -sorted -wo -s -f", percent_overlap, "-F", percent_overlap, "-e", "-a", R.bed, "-b", R.bed, ">", R.ol)
+  if(verbose) message(cmd)
+  system(cmd)
 
   # Get overlap graph
   L.dt <- fread(L.ol, select = c(4, 10), col.names = c("q", "s"))
   R.dt <- fread(R.ol, select = c(4, 10), col.names = c("q", "s"))
 
-  s <- unique(c(L.dt$s, R.dt$s))
+  # Delete temporary files
+  invisible(file.remove(L.bed))
+  invisible(file.remove(R.bed))
+  invisible(file.remove(L.ol))
+  invisible(file.remove(R.ol))
+
+  # Remove self matches
+  L.dt <- L.dt[q != s]
+  R.dt <- R.dt[q != s]
+
+  # Create list for graph
+  # s <- unique(c(L.dt$s, R.dt$s)) # All that have at least one arm overlapping
+  s <- intersect(L.dt$s, R.dt$s) # All that have both arms overlapping
   s.list <- parallel::mclapply(s, function(x) {
 
     return(c(L.dt[s == x]$q, R.dt[s == x]$q)[duplicated(c(L.dt[s == x]$q, R.dt[s == x]$q))])
@@ -210,17 +230,12 @@ cluster_sampled_hybrids <- function(hybrid.dt, sample_size, percent_overlap, cor
                             name = unlist(clusters))
   setkey(clusters.dt, name)
   stopifnot(any(!duplicated(clusters.dt$name))) # Make sure no hybrid is in more than one cluster
+  clusters.dt[, cluster := paste0("C", cluster)]
 
   # Merge back
-  setkey(hybrid.dt, name)
-  clusters.dt <- hybrid.dt[clusters.dt]
+  setkey(hybrids.dt, name)
+  hybrids.dt <- merge(hybrids.dt, clusters.dt, by = "name", all.x = TRUE)
 
-  # Delete temporary files
-  invisible(file.remove(L.bed))
-  invisible(file.remove(R.bed))
-  invisible(file.remove(L.ol))
-  invisible(file.remove(R.ol))
-
-  return(clusters.dt)
+  return(hybrids.dt)
 
 }
