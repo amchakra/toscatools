@@ -13,7 +13,7 @@
 
 get_contact_map <- function(hybrid.dt, genome.size, verbose = TRUE) {
 
-  hybrid.dt <- primavera::ReorientHybrids(hybrid.dt)
+  hybrid.dt <- primavera::reorient_hybrids(hybrid.dt)
 
   mat <- matrix(data = 0, nrow = genome.size, ncol = genome.size)
 
