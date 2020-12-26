@@ -6,7 +6,7 @@
 \usage{
 get_valid_hybrids(
   blast.query.dt,
-  min_unmapped_length = 21,
+  min_unmapped_length = 16,
   q_minoverlap = 4,
   q_maxgap = 4,
   s_minoverlap = 0,

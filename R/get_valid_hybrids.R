@@ -35,10 +35,9 @@ calculate_blast8_metrics <- function(blast.dt) {
 #'
 #' @examples
 
-get_valid_hybrids <- function(blast.query.dt, min_unmapped_length = 21, q_minoverlap = 4, q_maxgap = 4, s_minoverlap = 0, xlink_distance = 5, max_read_length = 100) {
+get_valid_hybrids <- function(blast.query.dt, min_unmapped_length = 16, q_minoverlap = 4, q_maxgap = 4, s_minoverlap = 0, xlink_distance = 5, max_read_length = 100) {
 
   # Keep best match for a given query region
-  blast.query.dt[, min_evalue := min(evalue), by = .(q_start, q_end)]
   hybrids.dt <- blast.query.dt[evalue == min_evalue]
 
   # Match up with fasta read length and remove if enough of a continuous match for any hit
@@ -80,5 +79,63 @@ get_valid_hybrids <- function(blast.query.dt, min_unmapped_length = 21, q_minove
     return(hybrids.dt)
 
   }
+
+}
+
+#' Title
+#'
+#' @param hybrids.dt
+#'
+#' @return
+#' @import data.table
+#' @export
+#'
+#' @examples
+
+filter_valid_hybrids <- function(hybrids.dt) {
+
+  hybrids.dt <- reorient_hybrids(hybrids.dt)
+
+  hybrids.dt[, multi := .N, by = query]
+  single.hybrids.dt <- hybrids.dt[multi == 1]
+  multi.hybrids.dt <- hybrids.dt[multi > 1]
+
+  ol <- find_hybrid_overlaps(multi.hybrids.dt, single.hybrids.dt)
+  multi.hybrids.dt <- multi.hybrids.dt[unique(ol$queryHits)]
+
+  # Some multi match more than one single
+  multi.hybrids.dt[, q_length_exc_gap := max(L_q_end, R_q_end) - min(L_q_start, R_q_start) + 1 + q_ol, by = .(query, id)]
+  multi.hybrids.dt[, total_alignment_length := L_alignment_length + R_alignment_length]
+
+  multi.hybrids.dt <- multi.hybrids.dt[, max_total_alignment_length := max(total_alignment_length), by = query]
+  multi.hybrids.dt <- multi.hybrids.dt[total_alignment_length == max_total_alignment_length] # Keep one with with longest total alignment length
+  multi.hybrids.dt <- multi.hybrids.dt[, max_q_length_exc_gap := max(q_length_exc_gap), by = query]
+  multi.hybrids.dt <- multi.hybrids.dt[q_length_exc_gap == max_q_length_exc_gap] # Keep one with with longest query length minus the gap
+  multi.hybrids.dt <- multi.hybrids.dt[, N := .N, by = query][N == 1] # Keep only those with a unique match
+
+  # Write out
+  single.hybrids.dt[, hybrid_selection := "single"]
+  multi.hybrids.dt[, hybrid_selection := "multi_overlap"]
+  valid.hybrids.dt <- rbindlist(list(single.hybrids.dt, multi.hybrids.dt), use.names = TRUE, fill = TRUE)
+
+  other.hybrids.dt <- hybrids.dt[!query %in% valid.hybrids.dt$query]
+  other.hybrids.dt[, hybrid_selection := "ambiguous"]
+
+  all.hybrids.dt <- rbindlist(list(valid.hybrids.dt, other.hybrids.dt), use.names = TRUE, fill = TRUE)
+  stopifnot(all(hybrids.dt$query %in% all.hybrids.dt$query))
+
+  # Tidy up
+  all.hybrids.dt[, `:=` (L_width = L_end - L_start + 1,
+                         L_strand = "+",
+                         R_width = R_end - R_start + 1,
+                         R_strand = "+")]
+  all.hybrids.dt[L_seqnames == R_seqnames, orientation := ifelse(L_q_start <= R_q_start, "genomic", "reverse")]
+  all.hybrids.dt[, type := ifelse(L_seqnames == R_seqnames, "intragenic", "intergenic")]
+  all.hybrids.dt <- all.hybrids.dt[, .(query, orientation, type, hybrid_selection,
+                                       L_seqnames, L_q_start, L_q_end, L_start, L_end, L_width, L_strand,
+                                       R_seqnames, R_q_start, R_q_end, R_start, R_end, R_width, R_strand)]
+  setnames(all.hybrids.dt, c("query", "L_q_start", "L_q_end", "R_q_start", "R_q_end"), c("read", "L_read_start", "L_read_end", "R_read_start", "R_read_end"))
+
+  return(all.hybrids.dt)
 
 }
