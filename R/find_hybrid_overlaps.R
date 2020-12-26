@@ -18,11 +18,11 @@ find_hybrid_overlaps <- function(hybrids.x.dt, hybrids.y.dt) {
   hybrids.y.dt <- reorient_hybrids(hybrids.y.dt)
 
   # Convert to GRanges
-  L.x.gr <- ConvertToGRanges(hybrids.x.dt, "L")
-  R.x.gr <- ConvertToGRanges(hybrids.x.dt, "R")
+  L.x.gr <- convert_to_granges(hybrids.x.dt, "L")
+  R.x.gr <- convert_to_granges(hybrids.x.dt, "R")
 
-  L.y.gr <- ConvertToGRanges(hybrids.y.dt, "L")
-  R.y.gr <- ConvertToGRanges(hybrids.y.dt, "R")
+  L.y.gr <- convert_to_granges(hybrids.y.dt, "L")
+  R.y.gr <- convert_to_granges(hybrids.y.dt, "R")
 
   all.seqlevels <- unique(c(hybrids.x.dt$L_seqnames, hybrids.x.dt$R_seqnames, hybrids.y.dt$L_seqnames, hybrids.y.dt$R_seqnames))
   GenomeInfoDb::seqlevels(L.x.gr) <- all.seqlevels
