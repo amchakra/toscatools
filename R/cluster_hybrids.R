@@ -213,16 +213,18 @@ cluster_hybrids <- function(hybrids.dt, sample_size = -1, percent_overlap = 0.75
   R.dt <- R.dt[q != s]
 
   # Create list for graph
-  # s <- unique(c(L.dt$s, R.dt$s)) # All that have at least one arm overlapping
   s <- intersect(L.dt$s, R.dt$s) # All that have both arms overlapping
   s.list <- parallel::mclapply(s, function(x) {
 
-    return(c(L.dt[s == x]$q, R.dt[s == x]$q)[duplicated(c(L.dt[s == x]$q, R.dt[s == x]$q))])
+    q <- intersect(L.dt[s == x]$q, R.dt[s == x]$q)
+    return(q)
 
   }, mc.cores = cores)
-  names(s.list) <- s
 
-  NEL <- graph::graphNEL(nodes = as.character(s), edgeL = s.list, edgemode = "undirected")
+  names(s.list) <- s
+  s.list <- s.list[S4Vectors::elementNROWS(s.list) > 0] # remove entries without any matches
+
+  NEL <- graph::graphNEL(nodes = names(s.list), edgeL = s.list, edgemode = "undirected")
 
   # Get connected nodes (i.e. clusters)
   clusters <- RBGL::connectedComp(NEL) # https://support.bioconductor.org/p/85092/
