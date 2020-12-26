@@ -254,14 +254,14 @@ cluster_hybrids <- function(hybrids.dt, sample_size = -1, percent_overlap = 0.75
 
 collapse_clusters <- function(hybrids.dt) {
 
-  clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)]
+  clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)][cluster != ""]
   clusters.dt[, `:=` (L_cluster_start = floor(median(L_start)),
                       L_cluster_end = ceiling(median(L_end)),
                       R_cluster_start = floor(median(R_start)),
                       R_cluster_end = ceiling(median(R_end))),
-              by = .(L_seqnames, cluster)]
+              by = .(L_seqnames, R_seqnames, cluster)]
 
-  clusters.dt[, count := .N, by = .(L_seqnames, cluster)]
+  clusters.dt[, count := .N, by = .(L_seqnames, R_seqnames, cluster)]
   clusters.dt <- unique(clusters.dt[, .(L_seqnames, L_cluster_start, L_cluster_end, L_strand,
                                         R_seqnames, R_cluster_start, R_cluster_end, R_strand,
                                         cluster, count)])
