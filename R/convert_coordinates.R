@@ -11,7 +11,7 @@
 #'
 #' @examples
 
-convert_coordinates <- function(hybrids.dt, genes.gr, filename, sam_tag = TRUE) {
+convert_coordinates <- function(hybrids.dt, genes.gr) {
 
   # Get genes.dt
   genes.dt <- as.data.table(genes.gr)[, .(fasta_id, seqnames, start, end, strand)]
@@ -20,19 +20,75 @@ convert_coordinates <- function(hybrids.dt, genes.gr, filename, sam_tag = TRUE) 
 
   coord.dt <- merge(hybrids.dt, genes.dt, by.x = "L_seqnames", by.y = "fasta_id")
 
-  # Do positive strand genes
-  coord.dt[strand == "+", `:=` (L.start = L_start + start - 1,
-                                L.end = L_end + start - 1,
-                                R.start = R_start + start - 1,
-                                R.end = R_end + start - 1),
+  # Do L
+  setkey(hybrids.dt, L_seqnames)
+  coord.dt <- merge(hybrids.dt, genes.dt, by.x = "L_seqnames", by.y = "fasta_id")
+
+  coord.dt[strand == "+", `:=` (L_genomic_start = L_start + start - 1,
+                                L_genomic_end = L_end + start - 1,
+                                L_genomic_strand = "+"),
+           by = name]
+  coord.dt[strand == "-", `:=` (L_genomic_start = end - L_end,
+                                L_genomic_end = end - L_start,
+                                L_genomic_strand = "-"),
            by = name]
 
-  # Do negative strand genes
-  # Flip R and L for BEDgraph
-  coord.dt[strand == "-", `:=` (R.end = end - L_start,
-                                R.start = end - L_end,
-                                L.end = end - R_start,
-                                L.start = end - R_end),
+  # Do R
+  coord.dt[, `:=` (seqnames = NULL, start = NULL, end = NULL, strand = NULL)]
+  setkey(coord.dt, R_seqnames)
+  coord.dt <- merge(coord.dt, genes.dt, by.x = "R_seqnames", by.y = "fasta_id")
+
+  coord.dt[strand == "+", `:=` (R_genomic_start = R_start + start - 1,
+                                R_genomic_end = R_end + start - 1,
+                                R_genomic_strand = "+"),
+           by = name]
+  coord.dt[strand == "-", `:=` (R_genomic_start = end - R_end,
+                                R_genomic_end = end - R_start,
+                                R_genomic_strand = "+"),
+           by = name]
+
+  # Tidy up
+  coord.dt[, `:=` (seqnames = NULL, start = NULL, end = NULL, strand = NULL)]
+
+  col.names <- names(coord.dt)
+  ordered.col.names <- c(grep("^L|^R", col.names, invert = TRUE, value = TRUE),
+                         grep("^L", col.names, value = TRUE),
+                         grep("^R", col.names, value = TRUE))
+  stopifnot(all(ordered.col.names %in% col.names))
+  setcolorder(coord.dt, ordered.col.names)
+
+  return(coord.dt)
+
+}
+
+#' Title
+#'
+#' @param hybrids.dt
+#' @param filename
+#' @param sam_tag
+#'
+#' @return
+#' @export
+#' @import data.table
+#'
+#' @examples
+
+export_genomic_bed <- function(hybrids.dt, filename, sam_tag = TRUE) {
+
+  if(!all(hybrids.dt$L_seqnames == hybrids.dt$R_seqnames)) stop("Hybrids are not all intragenic")
+
+  coord.dt <- hybrids.dt[, `:=` (L.start = L_genomic_start,
+                                 L.end = L_genomic_end,
+                                 R.start = R_genomic_start,
+                                 R.end = R_genomic_end,
+                                 strand = L_genomic_strand),
+                         by = name]
+
+  # # Flip R and L for BEDgraph for negative strand
+  coord.dt[strand == "-", `:=` (R.start = L_genomic_start,
+                                R.end = L_genomic_end,
+                                L.start = R_genomic_start,
+                                L.end = R_genomic_end),
            by = name]
 
   # Calculate bedgraph blocks
