@@ -24,11 +24,13 @@ convert_coordinates <- function(hybrids.dt, genes.gr) {
   setkey(hybrids.dt, L_seqnames)
   coord.dt <- merge(hybrids.dt, genes.dt, by.x = "L_seqnames", by.y = "fasta_id")
 
-  coord.dt[strand == "+", `:=` (L_genomic_start = L_start + start - 1,
+  coord.dt[strand == "+", `:=` (L_genomic_seqnames = seqnames,
+                                L_genomic_start = L_start + start - 1,
                                 L_genomic_end = L_end + start - 1,
                                 L_genomic_strand = "+"),
            by = name]
-  coord.dt[strand == "-", `:=` (L_genomic_start = end - L_end,
+  coord.dt[strand == "-", `:=` (L_genomic_seqnames = seqnames,
+                                L_genomic_start = end - L_end,
                                 L_genomic_end = end - L_start,
                                 L_genomic_strand = "-"),
            by = name]
@@ -38,11 +40,13 @@ convert_coordinates <- function(hybrids.dt, genes.gr) {
   setkey(coord.dt, R_seqnames)
   coord.dt <- merge(coord.dt, genes.dt, by.x = "R_seqnames", by.y = "fasta_id")
 
-  coord.dt[strand == "+", `:=` (R_genomic_start = R_start + start - 1,
+  coord.dt[strand == "+", `:=` (R_genomic_seqnames = seqnames,
+                                R_genomic_start = R_start + start - 1,
                                 R_genomic_end = R_end + start - 1,
                                 R_genomic_strand = "+"),
            by = name]
-  coord.dt[strand == "-", `:=` (R_genomic_start = end - R_end,
+  coord.dt[strand == "-", `:=` (R_genomic_seqnames = seqnames,
+                                R_genomic_start = end - R_end,
                                 R_genomic_end = end - R_start,
                                 R_genomic_strand = "+"),
            by = name]
@@ -81,6 +85,7 @@ export_genomic_bed <- function(hybrids.dt, filename, sam_tag = TRUE) {
                                  L.end = L_genomic_end,
                                  R.start = R_genomic_start,
                                  R.end = R_genomic_end,
+                                 seqnames = L_genomic_seqnames,
                                  strand = L_genomic_strand),
                          by = name]
 
