@@ -43,23 +43,49 @@ convert_to_datatable <- function(hybrids.grl) {
 #' @export
 
 
-convert_to_granges <- function(hybrids.dt, arm = c("L", "R")) {
+convert_to_granges <- function(hybrids.dt, arm = c("L", "R"), genomic = FALSE) {
 
-  if(arm == "L") {
+  if(!arm %in% c("L", "R")) stop("[ERROR]: arm should be L or R")
 
-    L.dt <- hybrids.dt[, grep("^R_", names(hybrids.dt), invert = TRUE), with = FALSE]
-    setnames(L.dt, names(L.dt), gsub("^L_", "", names(L.dt)))
-    L.gr <- GenomicRanges::GRanges(L.dt)
+  if(!genomic) {
 
-    return(L.gr)
+    if(arm == "L") {
 
-  } else if(arm == "R") {
+      L.dt <- hybrids.dt[, grep("^R_", names(hybrids.dt), invert = TRUE), with = FALSE]
+      setnames(L.dt, names(L.dt), gsub("^L_", "", names(L.dt)))
+      L.gr <- GenomicRanges::GRanges(L.dt)
 
-    R.dt <- hybrids.dt[, grep("^L_", names(hybrids.dt), invert = TRUE), with = FALSE]
-    setnames(R.dt, names(R.dt), gsub("^R_", "", names(R.dt)))
-    R.gr <- GenomicRanges::GRanges(R.dt)
+      return(L.gr)
 
-    return(R.gr)
+    } else if(arm == "R") {
+
+      R.dt <- hybrids.dt[, grep("^L_", names(hybrids.dt), invert = TRUE), with = FALSE]
+      setnames(R.dt, names(R.dt), gsub("^R_", "", names(R.dt)))
+      R.gr <- GenomicRanges::GRanges(R.dt)
+
+      return(R.gr)
+
+    }
+
+  } else if(genomic) {
+
+    if(arm == "L") {
+
+      L.dt <- hybrids.dt[, grep("^R_", names(hybrids.dt), invert = TRUE), with = FALSE]
+      setnames(L.dt, names(L.dt), gsub("^L_genomic_", "", names(L.dt)))
+      L.gr <- GenomicRanges::GRanges(L.dt)
+
+      return(L.gr)
+
+    } else if(arm == "R") {
+
+      R.dt <- hybrids.dt[, grep("^L_", names(hybrids.dt), invert = TRUE), with = FALSE]
+      setnames(R.dt, names(R.dt), gsub("^R_genomic_", "", names(R.dt)))
+      R.gr <- GenomicRanges::GRanges(R.dt)
+
+      return(R.gr)
+
+    }
 
   }
 

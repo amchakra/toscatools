@@ -4,7 +4,7 @@
 \alias{convert_to_granges}
 \title{Title}
 \usage{
-convert_to_granges(hybrids.dt, arm = c("L", "R"))
+convert_to_granges(hybrids.dt, arm = c("L", "R"), genomic = FALSE)
 }
 \arguments{
 \item{arm}{}

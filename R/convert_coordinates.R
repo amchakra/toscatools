@@ -48,7 +48,7 @@ convert_coordinates <- function(hybrids.dt, genes.gr) {
   coord.dt[strand == "-", `:=` (R_genomic_seqnames = seqnames,
                                 R_genomic_start = end - R_end,
                                 R_genomic_end = end - R_start,
-                                R_genomic_strand = "+"),
+                                R_genomic_strand = "-"),
            by = name]
 
   # Tidy up
