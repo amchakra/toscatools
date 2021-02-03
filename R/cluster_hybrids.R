@@ -230,8 +230,9 @@ cluster_hybrids <- function(hybrids.dt, sample_size = -1, percent_overlap = 0.75
   clusters <- RBGL::connectedComp(NEL) # https://support.bioconductor.org/p/85092/
   clusters.dt <- data.table(cluster = rep(names(clusters), S4Vectors::elementNROWS(clusters)),
                             name = unlist(clusters))
+  if(nrow(clusters.dt) == 0) clusters.dt[, name := character()] # In case there are no clusters
   setkey(clusters.dt, name)
-  stopifnot(any(!duplicated(clusters.dt$name))) # Make sure no hybrid is in more than one cluster
+  if(nrow(clusters.dt) != 0) stopifnot(any(!duplicated(clusters.dt$name))) # Make sure no hybrid is in more than one cluster, but only if there are clusters
   clusters.dt[, cluster := paste0("C", cluster)]
 
   # Merge back
