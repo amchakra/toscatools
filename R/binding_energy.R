@@ -62,12 +62,13 @@ GetMFE <- function(L_sequence, R_sequence) {
   input <- paste0(L_sequence, "\n", R_sequence)
   rnaduplex <- system("RNAduplex --noLP", input = input, intern = TRUE)
 
-  rnaduplex <- gsub("\\s+", "_", rnaduplex)
+  rnaduplex <- gsub("\\s+", "_", rnaduplex) 
   mfe <- sapply(strsplit(rnaduplex, "_"), "[", 5) # Need to fix for positives < 10 ? as they have an extra space
-
   mfe <- as.numeric(gsub("\\(|\\)", "", mfe))
+  
+  structure <- sapply(strsplit(rnaduplex, "_"), "[", 1) #added dot bracket structure
   # if(mfe > 0) mfe <- 0
 
-  return(mfe)
+  return(list(mfe = mfe, structure = structure))
 
 }
