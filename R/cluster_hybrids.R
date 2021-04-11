@@ -270,13 +270,22 @@ find_hybrid_overlaps <- function(hybrids.dt) {
   if(verbose) message(cmd)
   system(cmd)
 
-  bedpe.dt <- fread(ol, col.names = c(paste0(bedpe.colnames, ".x"), paste0(bedpe.colnames, ".y")))
+  # Check if there are no overlaps
+  if(file.size(ol) != 0) {
 
-  # Delete temporary files
-  invisible(file.remove(bedpe))
-  invisible(file.remove(ol))
+    bedpe.dt <- fread(ol, col.names = c(paste0(bedpe.colnames, ".x"), paste0(bedpe.colnames, ".y")))
+    # Delete temporary files
+    invisible(file.remove(bedpe))
+    invisible(file.remove(ol))
 
-  if(nrow(bedpe.dt) == 0) return(bedpe.dt)
+  } else {
+
+    # Delete temporary files
+    invisible(file.remove(bedpe))
+    invisible(file.remove(ol))
+    return(data.table())
+
+  }
 
   # Get calculations and filter
   bedpe.dt[, `:=` (L_ol = min(L_end.x, L_end.y) - max(L_start.x, L_start.y) + 1,
