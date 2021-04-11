@@ -253,7 +253,7 @@ cluster_hybrids_old <- function(hybrids.dt, sample_size = -1, percent_overlap = 
 #' @import data.table
 #' @export
 
-find_hybrid_overlaps <- function(hybrids.dt) {
+find_hybrid_overlaps <- function(hybrids.dt, verbose = FALSE) {
 
   hybrids.dt <- primavera::reorient_hybrids(hybrids.dt)
 
@@ -320,7 +320,7 @@ find_hybrid_overlaps <- function(hybrids.dt) {
 
 cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE) {
 
-  hybrids.bedpe.dt <- find_hybrid_overlaps(hybrids.dt)
+  hybrids.bedpe.dt <- find_hybrid_overlaps(hybrids.dt, verbose = verbose)
 
   if(nrow(hybrids.bedpe.dt) == 0) return(hybrids.dt[, cluster := as.character(NA)])
 
@@ -331,7 +331,7 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
   igraph::E(g)$weight <- sel.bedpe.dt$mean_p # weight by percent overlap
 
   c <- igraph::components(g)
-  message(c$no, " clusters")
+  if(verbose) message(c$no, " clusters")
 
   clusters.dt <- data.table(name = names(c$membership),
                             cluster = c$membership)
