@@ -40,11 +40,22 @@ annotate_hybrids <- function(hybrids.dt, regions.gr) {
                                   R_biotype = match.gr$biotype)]
 
   # bug fix for iCount missing a couple of intergenic regions
-  hybrids.dt[is.na(L_region), `:=` (R_region = "intergenic",
+  hybrids.dt[is.na(R_region), `:=` (R_region = "intergenic",
                                     R_gene_id = ".",
                                     R_gene_name = "None",
                                     R_biotype = "")]
 
+  # rRNA
+  hybrids.dt[grep("rRNA|rDNA", L_seqnames), `:=` (L_gene_id = L_seqnames,
+                                                  L_region = "rRNA",
+                                                  L_gene_name = L_seqnames,
+                                                  L_biotype = "rRNA")]
+  hybrids.dt[grep("rRNA|rDNA", R_seqnames), `:=` (R_gene_id = R_seqnames,
+                                                  R_region = "rRNA",
+                                                  R_gene_name = R_seqnames,
+                                                  R_biotype = "rRNA")]
+
+  stopifnot(all(!is.na(c(hybrids.dt$L_region, hybrids.dt$R_region))))
   return(hybrids.dt)
 
 }

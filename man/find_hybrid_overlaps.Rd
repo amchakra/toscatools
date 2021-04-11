@@ -4,7 +4,7 @@
 \alias{find_hybrid_overlaps}
 \title{Title}
 \usage{
-find_hybrid_overlaps(hybrids.dt)
+find_hybrid_overlaps(hybrids.dt, verbose = FALSE)
 }
 \arguments{
 \item{percent_overlap}{}
