@@ -11,7 +11,7 @@
 #'
 #' @examples
 
-find_hybrid_overlaps_old <- function(hybrids.x.dt, hybrids.y.dt) {
+find_hybrid_overlaps_simple <- function(hybrids.x.dt, hybrids.y.dt) {
 
   # Make sure uniformly oriented
   hybrids.x.dt <- reorient_hybrids(hybrids.x.dt)

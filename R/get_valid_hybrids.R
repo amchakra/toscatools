@@ -100,7 +100,7 @@ filter_valid_hybrids <- function(hybrids.dt) {
   single.hybrids.dt <- hybrids.dt[multi == 1]
   multi.hybrids.dt <- hybrids.dt[multi > 1]
 
-  ol <- find_hybrid_overlaps(multi.hybrids.dt, single.hybrids.dt)
+  ol <- find_hybrid_overlaps_simple(multi.hybrids.dt, single.hybrids.dt)
   multi.hybrids.dt <- multi.hybrids.dt[unique(ol$queryHits)]
 
   # Some multi match more than one single
