@@ -60,7 +60,7 @@ shuffle_sequence <- function(sequence, number = 1, klet = 2, seed = 42) {
 #'
 #' @examples
 
-analyse_structure <- function(L_sequence, R_sequence) {
+analyse_structure <- function(name, L_sequence, R_sequence) {
 
   input <- paste0(L_sequence, "\n", R_sequence)
   rnaduplex <- system("RNAduplex --noLP", input = input, intern = TRUE)
@@ -95,6 +95,58 @@ analyse_structure <- function(L_sequence, R_sequence) {
   stopifnot(all(length(l_db == l_width), length(r_db) == r_width))
   db <- paste0(c(l_db, "&", r_db), collapse = "")
 
-  return(data.table(mfe = mfe, structure = db))
+  return(data.table(name = name, mfe = mfe, structure = db))
+
+}
+
+#' Title
+#'
+#' @param name
+#' @param L_sequence
+#' @param R_sequence
+#'
+#' @return
+#' @export
+#' @import data.table
+#' @examples
+#'
+get_mfe <- function(name, L_sequence, R_sequence) {
+
+  input <- paste0(L_sequence, "\n", R_sequence)
+  rnaduplex <- system("RNAduplex --noLP", input = input, intern = TRUE)
+
+  # Get MFE
+  rnaduplex <- gsub("\\s+", "_", rnaduplex)
+  mfe <- sapply(strsplit(rnaduplex, "_"), "[", 5)
+  if(mfe == "(") mfe <- sapply(strsplit(rnaduplex, "_"), "[", 6) # Positives < 10 have an extra space
+  mfe <- as.numeric(gsub("\\(|\\)", "", mfe))
+
+  return(data.table(name = name, mfe = mfe))
+
+}
+
+#' Title
+#'
+#' @param name
+#' @param L_sequence
+#' @param R_sequence
+#'
+#' @return
+#' @export
+#' @import data.table
+#'
+#' @examples
+#'
+get_shuffled_mfe <- function(name, L_sequence, R_sequence) {
+
+  L <- shuffle_sequence(L_sequence, number = 100, klet = 2)
+  R <- shuffle_sequence(R_sequence, number = 100, klet = 2)
+
+  shuffled_mfe.dt <- rbindlist(lapply(seq_along(L), function(i) get_mfe(name, L[i], R[i])))
+  shuffled_mfe.dt[, `:=` (mean_shuffled_mfe = mean(mfe, na.rm = TRUE),
+                          sd_shuffled_mfe = sd(mfe, na.rm = TRUE)),
+                  by = name]
+
+  return(unique(shuffled_mfe.dt[, .(name, mean_shuffled_mfe, sd_shuffled_mfe)]))
 
 }
