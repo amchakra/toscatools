@@ -168,7 +168,7 @@ CollapseClusters <- function(hybrids.dt) {
 #'
 #' @examples
 
-cluster_hybrids <- function(hybrids.dt, sample_size = -1, percent_overlap = 0.75, cores = 8, verbose = FALSE) {
+cluster_hybrids_old <- function(hybrids.dt, sample_size = -1, percent_overlap = 0.75, cores = 8, verbose = FALSE) {
 
   hybrids.dt <- primavera::reorient_hybrids(hybrids.dt)
 
@@ -230,6 +230,105 @@ cluster_hybrids <- function(hybrids.dt, sample_size = -1, percent_overlap = 0.75
   clusters <- RBGL::connectedComp(NEL) # https://support.bioconductor.org/p/85092/
   clusters.dt <- data.table(cluster = rep(names(clusters), S4Vectors::elementNROWS(clusters)),
                             name = unlist(clusters))
+  if(nrow(clusters.dt) == 0) clusters.dt[, name := character()] # In case there are no clusters
+  setkey(clusters.dt, name)
+  if(nrow(clusters.dt) != 0) stopifnot(any(!duplicated(clusters.dt$name))) # Make sure no hybrid is in more than one cluster, but only if there are clusters
+  clusters.dt[, cluster := paste0("C", cluster)]
+
+  # Merge back
+  setkey(hybrids.dt, name)
+  hybrids.dt <- merge(hybrids.dt, clusters.dt, by = "name", all.x = TRUE)
+
+  return(hybrids.dt)
+
+}
+
+#' Title
+#'
+#' @param hybrids.dt
+#' @param percent_overlap
+#'
+#' @return
+#'
+#' @import data.table
+#' @export
+
+find_hybrid_overlaps <- function(hybrids.dt) {
+
+  hybrids.dt <- primavera::reorient_hybrids(hybrids.dt)
+
+  # Create BEDPE and get overlaps
+  bedpe.colnames <- c("L_seqnames", "L_start", "L_end", "R_seqnames", "R_start", "R_end", "name", "total_count", "L_strand", "R_strand")
+  bedpe.dt <- hybrids.dt[, ..bedpe.colnames]
+  bedpe.dt[, `:=` (L_start = L_start - 1, R_start = R_start - 1)]
+
+  bedpe <- tempfile(tmpdir = getwd(), fileext = ".bedpe")
+  ol <- tempfile(tmpdir = getwd(), fileext = ".bedpe")
+
+  fwrite(bedpe.dt, file = bedpe, sep = "\t", col.names = FALSE)
+  cmd <- paste("bedtools pairtopair -rdn -a", bedpe, "-b", bedpe, ">", ol)
+  if(verbose) message(cmd)
+  system(cmd)
+
+  bedpe.dt <- fread(ol, col.names = c(paste0(bedpe.colnames, ".x"), paste0(bedpe.colnames, ".y")))
+
+  # Delete temporary files
+  invisible(file.remove(bedpe))
+  invisible(file.remove(ol))
+
+  if(nrow(bedpe.dt) == 0) return(bedpe.dt)
+
+  # Get calculations and filter
+  bedpe.dt[, `:=` (L_ol = min(L_end.x, L_end.y) - max(L_start.x, L_start.y) + 1,
+                   R_ol = min(R_end.x, R_end.y) - max(R_start.x, R_start.y) + 1),
+           by = .(name.x, name.y)]
+
+  bedpe.dt[, `:=` (L_sp = max(L_end.x, L_end.y) - min(L_start.x, L_start.y) + 1,
+                   R_sp = max(R_end.x, R_end.y) - min(R_start.x, R_start.y) + 1),
+           by = .(name.x, name.y)]
+
+  bedpe.dt[, `:=` (L_p = L_ol/L_sp,
+                   R_p = R_ol/R_sp),
+           by = .(name.x, name.y)]
+
+  bedpe.dt[, mean_p := mean(c(L_p, R_p)), by = .(name.x, name.y)]
+  return(bedpe.dt)
+
+}
+
+#' Title
+#'
+#' @param hybrid.dt
+#' @param sample_size
+#' @param percent_overlap
+#' @param cores
+#'
+#' @return
+#' @import data.table
+#' @export
+#'
+#' @examples
+
+cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE) {
+
+  hybrids.bedpe.dt <- find_hybrid_overlaps(hybrids.dt)
+
+  if(nrow(hybrids.bedpe.dt) == 0) return(hybrids.dt[, cluster := as.character(NA)])
+
+  sel.bedpe.dt <- hybrids.bedpe.dt[L_p > percent_overlap & R_p > percent_overlap]
+
+  # igraph
+  g <- igraph::graph_from_edgelist(el = as.matrix(sel.bedpe.dt[, .(name.x, name.y)]), directed = FALSE)
+  igraph::E(g)$weight <- sel.bedpe.dt$mean_p # weight by percent overlap
+
+  c <- igraph::components(g)
+  message(c$no, " clusters")
+
+  clusters.dt <- data.table(name = names(c$membership),
+                            cluster = c$membership)
+  setorder(clusters.dt, cluster)
+
+  # Merge back
   if(nrow(clusters.dt) == 0) clusters.dt[, name := character()] # In case there are no clusters
   setkey(clusters.dt, name)
   if(nrow(clusters.dt) != 0) stopifnot(any(!duplicated(clusters.dt$name))) # Make sure no hybrid is in more than one cluster, but only if there are clusters
