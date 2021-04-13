@@ -364,7 +364,7 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
 
 collapse_clusters <- function(hybrids.dt) {
 
-  clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)][cluster != ""][cluster != "."]]
+  clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)][cluster != ""][cluster != "."]
   clusters.dt[, `:=` (L_cluster_start = floor(median(L_start)),
                       L_cluster_end = ceiling(median(L_end)),
                       R_cluster_start = floor(median(R_start)),
