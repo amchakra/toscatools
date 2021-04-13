@@ -345,10 +345,10 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
 
   # Merge back
   setkey(hybrids.dt, name)
-  hybrids.dt <- merge(hybrids.dt, clusters.dt, by = "name", all.x = TRUE)
-  hybrids.dt[is.na(cluster), cluster := "."]
+  hybrids.clustered.dt <- merge(hybrids.dt, clusters.dt, by = "name", all.x = TRUE)
+  hybrids.clustered.dt[is.na(cluster), cluster := "."]
 
-  return(hybrids.dt)
+  return(hybrids.clustered.dt)
 
 }
 
