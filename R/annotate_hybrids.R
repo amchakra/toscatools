@@ -13,7 +13,18 @@
 
 annotate_hybrids <- function(hybrids.dt, regions.gr) {
 
+  # ==========
+  # Left
+  # ==========
+
   L.gr <- convert_to_granges(hybrids.dt, arm = "L", genomic = TRUE)
+
+  # Sync seqlevels
+  common.seqlevels <- unique(c(GenomeInfoDb::seqlevels(L.gr),
+                               GenomeInfoDb::seqlevels(regions.gr)))
+  GenomeInfoDb::seqlevels(L.gr) <- common.seqlevels
+  GenomeInfoDb::seqlevels(regions.gr) <- common.seqlevels
+
   ol <- GenomicRanges::findOverlaps(GenomicRanges::resize(L.gr, width = 1, fix = "center"), regions.gr)
   stopifnot(all(!duplicated(S4Vectors::queryHits(ol))))
 
@@ -29,7 +40,18 @@ annotate_hybrids <- function(hybrids.dt, regions.gr) {
                                     L_gene_name = "None",
                                     L_biotype = "")]
 
+  # ==========
+  # Right
+  # ==========
+
   R.gr <- convert_to_granges(hybrids.dt, arm = "R", genomic = TRUE)
+
+  # Sync seqlevels
+  common.seqlevels <- unique(c(GenomeInfoDb::seqlevels(R.gr),
+                               GenomeInfoDb::seqlevels(regions.gr)))
+  GenomeInfoDb::seqlevels(R.gr) <- common.seqlevels
+  GenomeInfoDb::seqlevels(regions.gr) <- common.seqlevels
+
   ol <- GenomicRanges::findOverlaps(GenomicRanges::resize(R.gr, width = 1, fix = "center"), regions.gr)
   stopifnot(all(!duplicated(S4Vectors::queryHits(ol))))
 
