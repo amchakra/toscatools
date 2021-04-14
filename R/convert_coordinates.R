@@ -79,7 +79,8 @@ convert_coordinates <- function(hybrids.dt, genes.gr) {
 
 export_genomic_bed <- function(hybrids.dt, filename, sam_tag = TRUE) {
 
-  if(!all(hybrids.dt$L_seqnames == hybrids.dt$R_seqnames)) stop("Hybrids are not all intragenic")
+  if(!all(hybrids.dt$L_seqnames == hybrids.dt$R_seqnames)) stop("Hybrids should all be intragenic")
+  if(any(grepl("rRNA|rDNA", c(hybrids.dt$L_seqnames, hybrids.dt$R_seqnames)))) stop("Hybrids should not include rRNA")
 
   coord.dt <- hybrids.dt[, `:=` (L.start = L_genomic_start,
                                  L.end = L_genomic_end,
@@ -116,9 +117,9 @@ export_genomic_bed <- function(hybrids.dt, filename, sam_tag = TRUE) {
 
   if(sam_tag == TRUE) {
 
-    if("cluster" %in% names(coord.dt)) bed.dt$name <- paste0(bed.dt$name, "_", coord.dt$cluster)
-    if("orientation" %in% names(coord.dt)) bed.dt$name <- paste0(bed.dt$name, "_", coord.dt$orientation)
-    if("mfe" %in% names(coord.dt)) bed.dt$name <- paste0(bed.dt$name, "_", coord.dt$mfe)
+    if("cluster" %in% names(coord.dt)) { bed.dt$name <- paste0(bed.dt$name, "_", coord.dt$cluster) } else { bed.dt$name <- paste0(bed.dt$name, "_") }
+    if("orientation" %in% names(coord.dt)) { bed.dt$name <- paste0(bed.dt$name, "_", coord.dt$orientation) } else { bed.dt$name <- paste0(bed.dt$name, "_") }
+    if("mfe" %in% names(coord.dt)) { bed.dt$name <- paste0(bed.dt$name, "_", coord.dt$mfe) } else { bed.dt$name <- paste0(bed.dt$name, "_") }
 
   }
 

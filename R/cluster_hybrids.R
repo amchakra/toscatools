@@ -345,7 +345,7 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
 
   # Merge back
   setkey(hybrids.dt, name)
-  if("cluster" %in% names(hybrids.dt)) hybrids.dt[, cluster := NULL]
+  if("cluster" %in% names(hybrids.dt)) hybrids.dt[, cluster := NULL] # if clusters already assigned, remove them
   hybrids.clustered.dt <- merge(hybrids.dt, clusters.dt, by = "name", all.x = TRUE)
   hybrids.clustered.dt[is.na(cluster), cluster := "."]
 
