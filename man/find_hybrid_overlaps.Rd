@@ -2,16 +2,19 @@
 % Please edit documentation in R/cluster_hybrids.R
 \name{find_hybrid_overlaps}
 \alias{find_hybrid_overlaps}
-\title{Title}
+\title{Find overlapping pairs of hybrids}
 \usage{
 find_hybrid_overlaps(hybrids.dt, verbose = FALSE)
 }
 \arguments{
-\item{percent_overlap}{}
+\item{hybrids.dt}{Hybrids data.table}
+
+\item{verbose}{Print \code{bedtools} command}
 }
 \value{
-
+bedpe.dt with L, R and mean percentage overlap calculated
 }
 \description{
-Title
+Uses \code{bedtools pairtopair} to get all overlaps and then calculates percentage overlaps based on overall span of overlapping L and R arms.
+Called by \code{cluster_hybrids}
 }

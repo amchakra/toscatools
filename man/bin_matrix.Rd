@@ -2,16 +2,18 @@
 % Please edit documentation in R/contact_maps.R
 \name{bin_matrix}
 \alias{bin_matrix}
-\title{Title}
+\title{Bin contact map matrix}
 \usage{
 bin_matrix(mat, bin.size)
 }
 \arguments{
-\item{bin.size}{}
+\item{mat}{Contact map matrix}
+
+\item{bin.size}{Size of bin}
 }
 \value{
-
+Binnecd contact map matrix
 }
 \description{
-Title
+Bin contact map matrix
 }

@@ -2,16 +2,20 @@
 % Please edit documentation in R/contact_maps.R
 \name{get_contact_map}
 \alias{get_contact_map}
-\title{Title}
+\title{Get contact map}
 \usage{
 get_contact_map(hybrid.dt, genome.size, verbose = TRUE)
 }
 \arguments{
-\item{verbose}{}
+\item{hybrid.dt}{Hybrids data.table}
+
+\item{genome.size}{Size of genome/gene/region}
+
+\item{verbose}{Monitor progress}
 }
 \value{
-
+Contact map matrix
 }
 \description{
-Title
+Gets contact map matrix from hybrids.dt (previously subset to given gene/region)
 }

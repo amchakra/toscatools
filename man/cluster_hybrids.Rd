@@ -2,16 +2,18 @@
 % Please edit documentation in R/cluster_hybrids.R
 \name{cluster_hybrids}
 \alias{cluster_hybrids}
-\title{Title}
+\title{Cluster overlapping hybrids}
 \usage{
 cluster_hybrids(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
 }
 \arguments{
-\item{cores}{}
+\item{percent_overlap}{Minimum percentage overlap for both L and R arms}
+
+\item{hybrid.dt}{Hybrid data.table}
 }
 \value{
 
 }
 \description{
-Title
+Cluster overlapping hybrids using graph network analysis
 }

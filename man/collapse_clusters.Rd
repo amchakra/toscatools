@@ -2,16 +2,16 @@
 % Please edit documentation in R/cluster_hybrids.R
 \name{collapse_clusters}
 \alias{collapse_clusters}
-\title{Title}
+\title{Collapse clusters}
 \usage{
 collapse_clusters(hybrids.dt)
 }
 \arguments{
-\item{hybrids.dt}{}
+\item{hybrids.dt}{Hybrid data.table}
 }
 \value{
-
+Clusters data.table
 }
 \description{
-Title
+Collapse overlapping clusters of hybrids into a representative duplex
 }
