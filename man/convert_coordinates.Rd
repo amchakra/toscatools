@@ -2,16 +2,18 @@
 % Please edit documentation in R/convert_coordinates.R
 \name{convert_coordinates}
 \alias{convert_coordinates}
-\title{Title}
+\title{Convert coordinates}
 \usage{
 convert_coordinates(hybrids.dt, genes.gr)
 }
 \arguments{
-\item{sam_tag}{}
+\item{hybrids.dt}{Hybrids data.table}
+
+\item{genes.gr}{Transcript gtf as GRanges}
 }
 \value{
-
+\code{hybrids.dt} with genomic coordinates in \code{[L|R]_genomic_*} columns
 }
 \description{
-Title
+Convert from transcriptomic to genomic coordinates
 }

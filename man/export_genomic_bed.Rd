@@ -2,16 +2,20 @@
 % Please edit documentation in R/convert_coordinates.R
 \name{export_genomic_bed}
 \alias{export_genomic_bed}
-\title{Title}
+\title{Export BED}
 \usage{
 export_genomic_bed(hybrids.dt, filename, sam_tag = TRUE)
 }
 \arguments{
-\item{sam_tag}{}
+\item{hybrids.dt}{Hybrids data.table with genomic coordinates}
+
+\item{filename}{BED filename}
+
+\item{sam_tag}{Add SAM tags to \code{name} column in BED12}
 }
 \value{
-
+BED12 file exported
 }
 \description{
-Title
+Calculate and export BED12 file with genomic coordinates
 }
