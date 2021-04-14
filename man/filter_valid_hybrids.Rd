@@ -2,16 +2,19 @@
 % Please edit documentation in R/identify_hybrids.R
 \name{filter_valid_hybrids}
 \alias{filter_valid_hybrids}
-\title{Title}
+\title{Filter valid hybrids}
 \usage{
 filter_valid_hybrids(hybrids.dt)
 }
 \arguments{
-\item{hybrids.dt}{}
+\item{hybrids.dt}{Hybrids data.table}
 }
 \value{
-
+Hybrids data.table with \code{hybrid_selection} column
 }
 \description{
-Title
+Filter valid hybrids for each read as
+ (i) single/unique,
+ (ii) multiple hits, but one that overlaps a single/unique hit and is selected
+ (iii) multiple hits that do not overlap single/unique hits and termed ambiguous
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/identify_hybrids.R
 \name{get_valid_hybrids}
 \alias{get_valid_hybrids}
-\title{Title}
+\title{Get valid hybrids}
 \usage{
 get_valid_hybrids(
   blast.query.dt,
@@ -15,11 +15,21 @@ get_valid_hybrids(
 )
 }
 \arguments{
-\item{xlink_distance}{}
+\item{min_unmapped_length}{Minimum unmapped read length}
+
+\item{q_minoverlap}{Maximum overlap in left and right query arms}
+
+\item{q_maxgap}{Maximum gap between left and right query arms}
+
+\item{s_minoverlap}{Minimum overlap in left and right subject arms}
+
+\item{xlink_distance}{Maximum distance from start of the read (i.e. crosslink + 1 nt) before left arm starts}
+
+\item{blast8.query.dt}{blast8 data.table with read length and metrics}
 }
 \value{
-
+Hybrids data.table
 }
 \description{
-Title
+Calculate valid hybrids from Blat partial alignments
 }

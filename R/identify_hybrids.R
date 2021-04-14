@@ -2,53 +2,55 @@
 # Functions to identify hybrids from Blat output
 # ==========
 
-#' Title
+#' Load blast8 file
 #'
-#' @param blast8
+#' Load blast8 file as data.table
 #'
-#' @return
+#' @param blast8 blast8 file
+#' @return blast8 data.table
 #' @export
 #' @import data.table
-#'
-#' @examples
 
 load_blast8 <- function(blast8) {
-
-  dt <- data.table::fread(input = blast8,
-                          col.names = c("query",
-                                        "subject",
-                                        "identity",
-                                        "alignment_length",
-                                        "mismatches",
-                                        "gap_openings",
-                                        "q_start",
-                                        "q_end",
-                                        "s_start",
-                                        "s_end",
-                                        "evalue",
-                                        "bit_score"))
+  dt <- data.table::fread(
+    input = blast8,
+    col.names = c(
+      "query",
+      "subject",
+      "identity",
+      "alignment_length",
+      "mismatches",
+      "gap_openings",
+      "q_start",
+      "q_end",
+      "s_start",
+      "s_end",
+      "evalue",
+      "bit_score"
+    )
+  )
   setkey(dt, query)
   return(dt)
-
 }
 
-#' Title
+#' Add read lengths
 #'
-#' @param blast.dt
-#' @param fasta
+#' Add FASTA read lengths to blast8 data.table
 #'
-#' @return
+#' @param blast.dt blast8 data.table
+#' @param fasta FASTA file
+#' @return blast8 data.table with \code{readlength} column
 #' @export
 #' @import data.table
-#'
-#' @examples
 
 add_read_lengths <- function(blast.dt, fasta) {
 
   # Load fasta for read lengths
   fasta <- Biostrings::readDNAStringSet(fasta)
-  fasta.dt <- data.table(query = names(fasta),
-                         readlength = BiocGenerics::width(fasta))
+  fasta.dt <- data.table(
+    query = names(fasta),
+    readlength = BiocGenerics::width(fasta)
+  )
   setkey(fasta.dt, query)
 
   # Add to blast.dt
@@ -58,44 +60,42 @@ add_read_lengths <- function(blast.dt, fasta) {
   blast.dt <- fasta.dt[blast.dt]
 
   return(blast.dt)
-
 }
 
-#' Title
+#' Calculate blast8 metrics
 #'
-#' @param blast.dt
+#' Calcualte blast8 metrics for filtereing
 #'
-#' @return
+#' @param blast.dt blast8 data.table
+#' @return blast8 data.table with \code{min_evalue}, \code{q_length}, \code{unmapped} and \code{mapped} columns
 #' @export
 #' @import data.table
-
-#' @examples
 
 calculate_blast8_metrics <- function(blast.dt) {
 
   # Add calculations
   blast.dt[, min_evalue := min(evalue), by = .(query, q_start, q_end)] # minimum e-value for a given partial match
   blast.dt[, q_length := q_end - q_start + 1] # partial match length
-  blast.dt[, `:=` (unmapped = readlength - q_length,
-                   mapped = q_length/readlength)]
+  blast.dt[, `:=`(
+    unmapped = readlength - q_length,
+    mapped = q_length / readlength
+  )]
   return(blast.dt)
-
 }
 
-#' Title
+#' Get valid hybrids
 #'
-#' @param blast8.query.dt
-#' @param min_unmapped_length
-#' @param q_minoverlap
-#' @param q_maxgap
-#' @param s_minoverlap
-#' @param xlink_distance
+#' Calculate valid hybrids from Blat partial alignments
 #'
-#' @return
+#' @param blast8.query.dt blast8 data.table with read length and metrics
+#' @param min_unmapped_length Minimum unmapped read length
+#' @param q_minoverlap Maximum overlap in left and right query arms
+#' @param q_maxgap Maximum gap between left and right query arms
+#' @param s_minoverlap Minimum overlap in left and right subject arms
+#' @param xlink_distance Maximum distance from start of the read (i.e. crosslink + 1 nt) before left arm starts
+#' @return Hybrids data.table
 #' @export
 #' @import data.table
-#'
-#' @examples
 
 get_valid_hybrids <- function(blast.query.dt, min_unmapped_length = 16, q_minoverlap = 4, q_maxgap = 4, s_minoverlap = 0, xlink_distance = 5, max_read_length = 100) {
 
@@ -104,10 +104,8 @@ get_valid_hybrids <- function(blast.query.dt, min_unmapped_length = 16, q_minove
 
   # Match up with fasta read length and remove if enough of a continuous match for any hit
   # if(any(hybrids.dt$unmapped < (min_unmapped_length - q_minoverlap) & hybrids.dt$unmapped == 100)) {
-  if(any(hybrids.dt$unmapped < (min_unmapped_length - q_minoverlap))) {
-
+  if (any(hybrids.dt$unmapped < (min_unmapped_length - q_minoverlap))) {
     return(data.table())
-
   } else {
 
     # Now get combinations
@@ -122,8 +120,9 @@ get_valid_hybrids <- function(blast.query.dt, min_unmapped_length = 16, q_minove
 
     # Remove those with significant overlap in the subject mappings, if subjects are the same
     hybrids.dt <- hybrids.dt[, s_ol := ifelse(subject.x == subject.y,
-                                              min(s_end.x, s_end.y) - max(s_start.x, s_start.y) + 1,
-                                              0), by = id]
+      min(s_end.x, s_end.y) - max(s_start.x, s_start.y) + 1,
+      0
+    ), by = id]
     hybrids.dt <- hybrids.dt[s_ol <= s_minoverlap]
 
     # Remove those too far away from xlink position
@@ -136,26 +135,19 @@ get_valid_hybrids <- function(blast.query.dt, min_unmapped_length = 16, q_minove
     n <- gsub("_s_", "_", n)
     n <- gsub("_subject", "_seqnames", n)
     setnames(hybrids.dt, n)
-    hybrids.dt[, `:=` (L_strand = "+", R_strand = "+")]
+    hybrids.dt[, `:=`(L_strand = "+", R_strand = "+")]
 
     return(hybrids.dt)
-
   }
-
 }
 
-
-
-#' Title
+#' Find valid overlaps between hybrids
 #'
-#' @param hybrids.x.dt
-#' @param hybrids.y.dt
-#'
-#' @return
+#' @param hybrids.x.dt Hybrids data.table
+#' @param hybrids.y.dt Hybrids data.table
+#' @return Overlaps data.table
 #' @export
 #' @import data.table
-#'
-#' @examples
 
 find_valid_hybrid_overlaps <- function(hybrids.x.dt, hybrids.y.dt) {
 
@@ -191,15 +183,17 @@ find_valid_hybrid_overlaps <- function(hybrids.x.dt, hybrids.y.dt) {
 
 }
 
-#' Title
+#' Filter valid hybrids
 #'
-#' @param hybrids.dt
+#' Filter valid hybrids for each read as
+#'  (i) single/unique,
+#'  (ii) multiple hits, but one that overlaps a single/unique hit and is selected
+#'  (iii) multiple hits that do not overlap single/unique hits and termed ambiguous
 #'
-#' @return
+#' @param hybrids.dt Hybrids data.table
+#' @return Hybrids data.table with \code{hybrid_selection} column
 #' @import data.table
 #' @export
-#'
-#' @examples
 
 filter_valid_hybrids <- function(hybrids.dt) {
 

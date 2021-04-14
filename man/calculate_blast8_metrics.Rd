@@ -2,16 +2,16 @@
 % Please edit documentation in R/identify_hybrids.R
 \name{calculate_blast8_metrics}
 \alias{calculate_blast8_metrics}
-\title{Title}
+\title{Calculate blast8 metrics}
 \usage{
 calculate_blast8_metrics(blast.dt)
 }
 \arguments{
-\item{blast.dt}{}
+\item{blast.dt}{blast8 data.table}
 }
 \value{
-
+blast8 data.table with \code{min_evalue}, \code{q_length}, \code{unmapped} and \code{mapped} columns
 }
 \description{
-Title
+Calcualte blast8 metrics for filtereing
 }

@@ -2,16 +2,18 @@
 % Please edit documentation in R/identify_hybrids.R
 \name{find_valid_hybrid_overlaps}
 \alias{find_valid_hybrid_overlaps}
-\title{Title}
+\title{Find valid overlaps between hybrids}
 \usage{
 find_valid_hybrid_overlaps(hybrids.x.dt, hybrids.y.dt)
 }
 \arguments{
-\item{hybrids.y.dt}{}
+\item{hybrids.x.dt}{Hybrids data.table}
+
+\item{hybrids.y.dt}{Hybrids data.table}
 }
 \value{
-
+Overlaps data.table
 }
 \description{
-Title
+Find valid overlaps between hybrids
 }

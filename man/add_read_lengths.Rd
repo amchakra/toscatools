@@ -2,16 +2,18 @@
 % Please edit documentation in R/identify_hybrids.R
 \name{add_read_lengths}
 \alias{add_read_lengths}
-\title{Title}
+\title{Add read lengths}
 \usage{
 add_read_lengths(blast.dt, fasta)
 }
 \arguments{
-\item{fasta}{}
+\item{blast.dt}{blast8 data.table}
+
+\item{fasta}{FASTA file}
 }
 \value{
-
+blast8 data.table with \code{readlength} column
 }
 \description{
-Title
+Add FASTA read lengths to blast8 data.table
 }
