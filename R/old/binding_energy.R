@@ -8,7 +8,6 @@
 #' @return
 #'
 #' @import data.table
-#' @export
 
 GetSequence <- function(hybrids.dt, genome.dt) {
 
@@ -41,7 +40,6 @@ GetSequence <- function(hybrids.dt, genome.dt) {
 #' @param seed
 #'
 #' @return
-#' @export
 
 ShuffleSequence <- function(sequence, number = 1, klet = 2, seed = 42) {
 
@@ -55,7 +53,6 @@ ShuffleSequence <- function(sequence, number = 1, klet = 2, seed = 42) {
 #' @param sequence2
 #'
 #' @return
-#' @export
 
 GetMFE <- function(L_sequence, R_sequence) {
 

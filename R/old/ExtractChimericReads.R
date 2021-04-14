@@ -7,7 +7,6 @@
 #' @return
 #'
 #' @import data.table
-#' @export
 
 ExtractChimericReads <- function(chimeric.junction) {
 

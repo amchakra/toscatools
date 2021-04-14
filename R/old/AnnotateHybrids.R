@@ -7,7 +7,6 @@
 #' @return
 #'
 #' @import data.table
-#' @export
 
 AnnotateHybrids <- function(hybrids.dt, ref.gr) {
 
@@ -43,7 +42,6 @@ AnnotateHybrids <- function(hybrids.dt, ref.gr) {
 #' @param ref.gr
 #'
 #' @return
-#' @export
 
 AnnotateHybridArm <- function(arm.gr, ref.gr) {
 

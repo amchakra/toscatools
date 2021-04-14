@@ -8,7 +8,6 @@
 #'
 #' @return
 #' @import data.table
-#' @export
 
 ConvertCoordinates <- function(seq.dt, genes.gr, cores) {
 
@@ -82,7 +81,6 @@ ConvertCoordinates <- function(seq.dt, genes.gr, cores) {
 #'
 #' @return
 #' @import data.table
-#' @export
 
 ExportGenomicBED <- function(seq.dt, genes.gr, filename, sam_tag = TRUE) {
 
@@ -149,7 +147,6 @@ ExportGenomicBED <- function(seq.dt, genes.gr, filename, sam_tag = TRUE) {
 #' @return
 #'
 #' @import data.table
-#' @export
 
 ExportBED <- function(g.grl, hybrids.dt, filename, sam_tag = TRUE) {
 

@@ -7,7 +7,6 @@
 #' @return
 #'
 #' @import data.table
-#' @export
 
 
 ExtractHybrids <- function(aligned.bam, chimeric.junction) {
@@ -99,7 +98,6 @@ ExtractHybrids <- function(aligned.bam, chimeric.junction) {
 #' @return
 #'
 #' @import data.table
-#' @export
 #'
 
 ExtractHybridsWithinBAM <- function(aligned.bam, remove.repeats = FALSE) {
@@ -211,7 +209,6 @@ ExtractHybridsWithinBAM <- function(aligned.bam, remove.repeats = FALSE) {
 #' @return
 #'
 #' @import data.table
-#' @export
 
 RemovePCRDuplicates <- function(hybrids.dt) {
 

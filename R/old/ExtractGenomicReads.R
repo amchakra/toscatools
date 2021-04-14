@@ -5,7 +5,6 @@
 #'
 #' @return
 #'
-#' @export
 
 ExtractGenomicReads <- function(aligned.bam) {
 

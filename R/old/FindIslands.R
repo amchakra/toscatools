@@ -7,7 +7,6 @@
 #' @param cores
 #'
 #' @return
-#' @export
 
 FindIslands <- function(hybrids.dt, minimum.coverage = 2, minimum.width = 8, cores) {
 

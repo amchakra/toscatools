@@ -6,7 +6,6 @@
 #' @param fasta
 #'
 #' @return
-#' @export
 
 GetSequenceDS <- function(gr, fasta) {
 
@@ -36,7 +35,6 @@ GetSequenceDS <- function(gr, fasta) {
 #' @import data.table
 #'
 #' @return
-#' @export
 
 # Should only do this for intragenic?
 
