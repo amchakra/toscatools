@@ -7,7 +7,7 @@
 cluster_hybrids(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
 }
 \arguments{
-\item{percent_overlap}{Minimum percentage overlap for both L and R arms}
+\item{percent_overlap}{Minimum percentage overlap for both left and right arms}
 
 \item{hybrid.dt}{Hybrid data.table}
 }

@@ -2,19 +2,20 @@
 % Please edit documentation in R/get_structure.R
 \name{get_shuffled_mfe}
 \alias{get_shuffled_mfe}
-\title{Title}
+\title{Get shuffles binding energies}
 \usage{
 get_shuffled_mfe(name, L_sequence, R_sequence)
 }
 \arguments{
-\item{R_sequence}{}
+\item{name}{Hybrid name}
+
+\item{L_sequence}{Left sequence}
+
+\item{R_sequence}{Right sequence}
 }
 \value{
-
+data.table with mean and standard deviation of shuffles binding energies
 }
 \description{
-Title
-}
-\examples{
-
+Calculates mean and standard deviation of 100 shuffled binding energies using \code{RNAduplex} from \code{ViennaRNA}
 }

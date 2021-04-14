@@ -2,16 +2,18 @@
 % Please edit documentation in R/get_structure.R
 \name{get_sequence}
 \alias{get_sequence}
-\title{Title}
+\title{Get sequence}
 \usage{
 get_sequence(hybrids.dt, genome.dt)
 }
 \arguments{
-\item{genome.dt}{}
+\item{hybrids.dt}{Hybrids data.table}
+
+\item{genome.dt}{Transcriptome FASTA converted to data.table}
 }
 \value{
-
+hybrids.dt with \code{L_sequence} and \code{R_sequence} columns
 }
 \description{
-Title
+Get sequences for left and right hybrid arms
 }

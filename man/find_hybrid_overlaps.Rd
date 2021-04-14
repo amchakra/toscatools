@@ -12,9 +12,9 @@ find_hybrid_overlaps(hybrids.dt, verbose = FALSE)
 \item{verbose}{Print \code{bedtools} command}
 }
 \value{
-bedpe.dt with L, R and mean percentage overlap calculated
+bedpe.dt with left arm, right arm and mean percentage overlap calculated
 }
 \description{
-Uses \code{bedtools pairtopair} to get all overlaps and then calculates percentage overlaps based on overall span of overlapping L and R arms.
+Uses \code{bedtools pairtopair} to get all overlaps and then calculates percentage overlaps based on overall span of overlapping left and right arms.
 Called by \code{cluster_hybrids}
 }

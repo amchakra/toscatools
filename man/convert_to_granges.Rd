@@ -2,16 +2,20 @@
 % Please edit documentation in R/hybrid_functions.R
 \name{convert_to_granges}
 \alias{convert_to_granges}
-\title{Title}
+\title{Converts hybrids data.table to GRanges}
 \usage{
 convert_to_granges(hybrids.dt, arm = c("L", "R"), genomic = FALSE)
 }
 \arguments{
-\item{arm}{}
+\item{hybrids.dt}{hybrids data.table}
+
+\item{arm}{Convert left or right arm}
+
+\item{genomic}{Use genomic coordinates}
 }
 \value{
 
 }
 \description{
-Title
+Converts hybrids data.table to left or right arm GRanges, either using transcriptomic or genomic coordinates
 }

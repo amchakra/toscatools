@@ -2,19 +2,20 @@
 % Please edit documentation in R/get_structure.R
 \name{get_mfe}
 \alias{get_mfe}
-\title{Title}
+\title{Get binding energy}
 \usage{
 get_mfe(name, L_sequence, R_sequence)
 }
 \arguments{
-\item{R_sequence}{}
+\item{name}{Hybrid name}
+
+\item{L_sequence}{Left sequence}
+
+\item{R_sequence}{Right sequence}
 }
 \value{
-
+data.table with binding energy
 }
 \description{
-Title
-}
-\examples{
-
+Calculates binding energy using \code{RNAduplex} from \code{ViennaRNA}
 }

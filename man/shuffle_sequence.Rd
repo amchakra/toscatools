@@ -2,16 +2,22 @@
 % Please edit documentation in R/get_structure.R
 \name{shuffle_sequence}
 \alias{shuffle_sequence}
-\title{Title}
+\title{Shuffle sequence}
 \usage{
 shuffle_sequence(sequence, number = 1, klet = 2, seed = 42)
 }
 \arguments{
-\item{seed}{}
+\item{sequence}{Sequence as character vector}
+
+\item{number}{Number of shuffled sequences to return}
+
+\item{klet}{Preserve klet nucleotide frequencies}
+
+\item{seed}{Seed}
 }
 \value{
-
+Shuffled sequences as character vector
 }
 \description{
-Title
+Shuffles sequences using \code{uShuffle}
 }

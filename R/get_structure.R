@@ -1,11 +1,14 @@
+# ==========
+# Functions to analyse structures
+# ==========
 
-#' Title
+#' Get sequence
 #'
-#' @param hybrids.dt
-#' @param genome.dt
+#' Get sequences for left and right hybrid arms
 #'
-#' @return
-#'
+#' @param hybrids.dt Hybrids data.table
+#' @param genome.dt Transcriptome FASTA converted to data.table
+#' @return hybrids.dt with \code{L_sequence} and \code{R_sequence} columns
 #' @import data.table
 #' @export
 
@@ -17,7 +20,7 @@ get_sequence <- function(hybrids.dt, genome.dt) {
   setkey(hybrids.dt, gene_id)
   seq.dt <- genome.dt[hybrids.dt]
   seq.dt[, `:=`(L_sequence, stringr::str_sub(sequence, start = L_start, end = L_end))]
-  seq.dt[, `:=` (c("gene_id", "sequence"), NULL)]
+  seq.dt[, `:=`(c("gene_id", "sequence"), NULL)]
 
   # Get R
   # Do separately in case on different genes
@@ -25,50 +28,45 @@ get_sequence <- function(hybrids.dt, genome.dt) {
   setkey(seq.dt, gene_id)
   seq.dt <- genome.dt[seq.dt]
   seq.dt[, `:=`(R_sequence, stringr::str_sub(sequence, start = R_start, end = R_end))]
-  seq.dt[, `:=` (c("gene_id", "sequence"), NULL)]
+  seq.dt[, `:=`(c("gene_id", "sequence"), NULL)]
 
   return(seq.dt)
-
 }
 
-
-
-#' Title
+#' Shuffle sequence
 #'
-#' @param sequence
-#' @param klet
-#' @param seed
+#' Shuffles sequences using \code{uShuffle}
 #'
-#' @return
+#' @param sequence Sequence as character vector
+#' @param number Number of shuffled sequences to return
+#' @param klet Preserve klet nucleotide frequencies
+#' @param seed Seed
+#' @return Shuffled sequences as character vector
 #' @export
 
 shuffle_sequence <- function(sequence, number = 1, klet = 2, seed = 42) {
-
   system(paste0("uShuffle -seed ", seed, " -k ", klet, " -n ", number, " -s ", sequence), intern = TRUE)
-
 }
 
-#' Title
+#' Analyses hybrid structure
 #'
-#' @param L_sequence
-#' @param R_sequence
+#' Analyses hybrid structure using \code{RNAduplex} from \code{ViennaRNA}
 #'
-#' @return
-#'
+#' @param name Hybrid name
+#' @param L_sequence Left sequence
+#' @param R_sequence Right sequence
+#' @return data.table with binding energy and dot-bracket structure
 #' @import data.table
 #' @export
-#'
-#' @examples
 
 analyse_structure <- function(name, L_sequence, R_sequence) {
-
   input <- paste0(L_sequence, "\n", R_sequence)
   rnaduplex <- system("RNAduplex --noLP", input = input, intern = TRUE)
 
   # Get MFE
   rnaduplex <- gsub("\\s+", "_", rnaduplex)
   mfe <- sapply(strsplit(rnaduplex, "_"), "[", 5)
-  if(mfe == "(") mfe <- sapply(strsplit(rnaduplex, "_"), "[", 6) # Positives < 10 have an extra space
+  if (mfe == "(") mfe <- sapply(strsplit(rnaduplex, "_"), "[", 6) # Positives < 10 have an extra space
   mfe <- as.numeric(gsub("\\(|\\)", "", mfe))
 
   # Get dot.bracket
@@ -96,57 +94,54 @@ analyse_structure <- function(name, L_sequence, R_sequence) {
   db <- paste0(c(l_db, "&", r_db), collapse = "")
 
   return(data.table(name = name, mfe = mfe, structure = db))
-
 }
 
-#' Title
+#' Get binding energy
 #'
-#' @param name
-#' @param L_sequence
-#' @param R_sequence
+#' Calculates binding energy using \code{RNAduplex} from \code{ViennaRNA}
 #'
-#' @return
-#' @export
+#' @param name Hybrid name
+#' @param L_sequence Left sequence
+#' @param R_sequence Right sequence
+#' @return data.table with binding energy
 #' @import data.table
-#' @examples
-#'
-get_mfe <- function(name, L_sequence, R_sequence) {
+#' @export
 
+get_mfe <- function(name, L_sequence, R_sequence) {
   input <- paste0(L_sequence, "\n", R_sequence)
   rnaduplex <- system("RNAduplex --noLP", input = input, intern = TRUE)
 
   # Get MFE
   rnaduplex <- gsub("\\s+", "_", rnaduplex)
   mfe <- sapply(strsplit(rnaduplex, "_"), "[", 5)
-  if(mfe == "(") mfe <- sapply(strsplit(rnaduplex, "_"), "[", 6) # Positives < 10 have an extra space
+  if (mfe == "(") mfe <- sapply(strsplit(rnaduplex, "_"), "[", 6) # Positives < 10 have an extra space
   mfe <- as.numeric(gsub("\\(|\\)", "", mfe))
 
   return(data.table(name = name, mfe = mfe))
-
 }
 
-#' Title
+#' Get shuffles binding energies
 #'
-#' @param name
-#' @param L_sequence
-#' @param R_sequence
+#' Calculates mean and standard deviation of 100 shuffled binding energies using \code{RNAduplex} from \code{ViennaRNA}
 #'
-#' @return
-#' @export
+#' @param name Hybrid name
+#' @param L_sequence Left sequence
+#' @param R_sequence Right sequence
+#' @return data.table with mean and standard deviation of shuffles binding energies
 #' @import data.table
-#'
-#' @examples
-#'
-get_shuffled_mfe <- function(name, L_sequence, R_sequence) {
+#' @export
 
+get_shuffled_mfe <- function(name, L_sequence, R_sequence) {
   L <- shuffle_sequence(L_sequence, number = 100, klet = 2)
   R <- shuffle_sequence(R_sequence, number = 100, klet = 2)
 
   shuffled_mfe.dt <- rbindlist(lapply(seq_along(L), function(i) get_mfe(name, L[i], R[i])))
-  shuffled_mfe.dt[, `:=` (mean_shuffled_mfe = mean(mfe, na.rm = TRUE),
-                          sd_shuffled_mfe = sd(mfe, na.rm = TRUE)),
-                  by = name]
+  shuffled_mfe.dt[, `:=`(
+    mean_shuffled_mfe = mean(mfe, na.rm = TRUE),
+    sd_shuffled_mfe = sd(mfe, na.rm = TRUE)
+  ),
+  by = name
+  ]
 
   return(unique(shuffled_mfe.dt[, .(name, mean_shuffled_mfe, sd_shuffled_mfe)]))
-
 }

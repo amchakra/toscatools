@@ -2,16 +2,16 @@
 % Please edit documentation in R/hybrid_functions.R
 \name{convert_to_datatable}
 \alias{convert_to_datatable}
-\title{Title}
+\title{Converts GRangesList to hybrid data.table}
 \usage{
 convert_to_datatable(hybrids.grl)
 }
 \arguments{
-\item{hybrids.grl}{}
+\item{hybrids.grl}{GRangesList of length 2 with L and R GRanges}
 }
 \value{
-
+hybrids data.table
 }
 \description{
-Title
+Converts GRangesList to hybrid data.table
 }

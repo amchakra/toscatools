@@ -4,12 +4,12 @@
 
 #' Find overlapping pairs of hybrids
 #'
-#' Uses \code{bedtools pairtopair} to get all overlaps and then calculates percentage overlaps based on overall span of overlapping L and R arms.
+#' Uses \code{bedtools pairtopair} to get all overlaps and then calculates percentage overlaps based on overall span of overlapping left and right arms.
 #' Called by \code{cluster_hybrids}
 #'
 #' @param hybrids.dt Hybrids data.table
 #' @param verbose Print \code{bedtools} command
-#' @return bedpe.dt with L, R and mean percentage overlap calculated
+#' @return bedpe.dt with left arm, right arm and mean percentage overlap calculated
 #' @import data.table
 #' @export
 
@@ -77,7 +77,7 @@ find_hybrid_overlaps <- function(hybrids.dt, verbose = FALSE) {
 #' Cluster overlapping hybrids using graph network analysis
 #'
 #' @param hybrid.dt Hybrid data.table
-#' @param percent_overlap Minimum percentage overlap for both L and R arms
+#' @param percent_overlap Minimum percentage overlap for both left and right arms
 #' @return
 #' @import data.table
 #' @export

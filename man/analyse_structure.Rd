@@ -2,16 +2,20 @@
 % Please edit documentation in R/get_structure.R
 \name{analyse_structure}
 \alias{analyse_structure}
-\title{Title}
+\title{Analyses hybrid structure}
 \usage{
 analyse_structure(name, L_sequence, R_sequence)
 }
 \arguments{
-\item{R_sequence}{}
+\item{name}{Hybrid name}
+
+\item{L_sequence}{Left sequence}
+
+\item{R_sequence}{Right sequence}
 }
 \value{
-
+data.table with binding energy and dot-bracket structure
 }
 \description{
-Title
+Analyses hybrid structure using \code{RNAduplex} from \code{ViennaRNA}
 }
