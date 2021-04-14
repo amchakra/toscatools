@@ -1,16 +1,13 @@
-
-
-#' Title
+#' Annotate hybrids using iCount regions file
 #'
-#' @param hybrids.dt
-#' @param regions.gr
-#'
-#' @return
+#' @param hybrids.dt Hybrids data.table
+#' @param regions.gr iCount regions.gtf file as GRanges
+#' @return \code{hybrids.dt} annotated with \code{region}, \code{gene_id}, \code{gene_name} and \code{biotype} columns
 #' @export
 #' @import data.table
 #'
 #' @examples
-
+#' annotate_hybrids(hybrids.dt = clusters.hybrids.dt, regions.gr = regions.gtf)
 annotate_hybrids <- function(hybrids.dt, regions.gr) {
 
   # ==========
@@ -20,8 +17,10 @@ annotate_hybrids <- function(hybrids.dt, regions.gr) {
   L.gr <- primavera::convert_to_granges(hybrids.dt, arm = "L", genomic = TRUE)
 
   # Sync seqlevels
-  common.seqlevels <- unique(c(GenomeInfoDb::seqlevels(L.gr),
-                               GenomeInfoDb::seqlevels(regions.gr)))
+  common.seqlevels <- unique(c(
+    GenomeInfoDb::seqlevels(L.gr),
+    GenomeInfoDb::seqlevels(regions.gr)
+  ))
   GenomeInfoDb::seqlevels(L.gr) <- common.seqlevels
   GenomeInfoDb::seqlevels(regions.gr) <- common.seqlevels
 
@@ -29,16 +28,12 @@ annotate_hybrids <- function(hybrids.dt, regions.gr) {
   stopifnot(all(!duplicated(S4Vectors::queryHits(ol))))
 
   match.gr <- regions.gr[S4Vectors::subjectHits(ol)]
-  hybrids.dt[S4Vectors::queryHits(ol), `:=` (L_region = match.gr$type,
-                                  L_gene_id = match.gr$gene_id,
-                                  L_gene_name = match.gr$gene_name,
-                                  L_biotype = match.gr$biotype)]
-
-  # bug fix for iCount missing a couple of intergenic regions
-  hybrids.dt[is.na(L_region), `:=` (L_region = "intergenic",
-                                    L_gene_id = ".",
-                                    L_gene_name = "None",
-                                    L_biotype = "")]
+  hybrids.dt[S4Vectors::queryHits(ol), `:=`(
+    L_region = match.gr$type,
+    L_gene_id = match.gr$gene_id,
+    L_gene_name = match.gr$gene_name,
+    L_biotype = match.gr$biotype
+  )]
 
   # ==========
   # Right
@@ -47,8 +42,10 @@ annotate_hybrids <- function(hybrids.dt, regions.gr) {
   R.gr <- primavera::convert_to_granges(hybrids.dt, arm = "R", genomic = TRUE)
 
   # Sync seqlevels
-  common.seqlevels <- unique(c(GenomeInfoDb::seqlevels(R.gr),
-                               GenomeInfoDb::seqlevels(regions.gr)))
+  common.seqlevels <- unique(c(
+    GenomeInfoDb::seqlevels(R.gr),
+    GenomeInfoDb::seqlevels(regions.gr)
+  ))
   GenomeInfoDb::seqlevels(R.gr) <- common.seqlevels
   GenomeInfoDb::seqlevels(regions.gr) <- common.seqlevels
 
@@ -56,28 +53,49 @@ annotate_hybrids <- function(hybrids.dt, regions.gr) {
   stopifnot(all(!duplicated(S4Vectors::queryHits(ol))))
 
   match.gr <- regions.gr[S4Vectors::subjectHits(ol)]
-  hybrids.dt[S4Vectors::queryHits(ol), `:=` (R_region = match.gr$type,
-                                  R_gene_id = match.gr$gene_id,
-                                  R_gene_name = match.gr$gene_name,
-                                  R_biotype = match.gr$biotype)]
+  hybrids.dt[S4Vectors::queryHits(ol), `:=`(
+    R_region = match.gr$type,
+    R_gene_id = match.gr$gene_id,
+    R_gene_name = match.gr$gene_name,
+    R_biotype = match.gr$biotype
+  )]
 
-  # bug fix for iCount missing a couple of intergenic regions
-  hybrids.dt[is.na(R_region), `:=` (R_region = "intergenic",
-                                    R_gene_id = ".",
-                                    R_gene_name = "None",
-                                    R_biotype = "")]
-
+  # ==========
   # rRNA
-  hybrids.dt[grep("rRNA|rDNA", L_seqnames), `:=` (L_gene_id = L_seqnames,
-                                                  L_region = "rRNA",
-                                                  L_gene_name = L_seqnames,
-                                                  L_biotype = "rRNA")]
-  hybrids.dt[grep("rRNA|rDNA", R_seqnames), `:=` (R_gene_id = R_seqnames,
-                                                  R_region = "rRNA",
-                                                  R_gene_name = R_seqnames,
-                                                  R_biotype = "rRNA")]
+  # ==========
+
+  hybrids.dt[grep("rRNA|rDNA", L_seqnames), `:=`(
+    L_gene_id = L_seqnames,
+    L_region = "rRNA",
+    L_gene_name = L_seqnames,
+    L_biotype = "rRNA"
+  )]
+  hybrids.dt[grep("rRNA|rDNA", R_seqnames), `:=`(
+    R_gene_id = R_seqnames,
+    R_region = "rRNA",
+    R_gene_name = R_seqnames,
+    R_biotype = "rRNA"
+  )]
+
+  # ==========
+  # Bug work-around for iCount missing a couple of intergenic regions
+  # ==========
+
+  hybrids.dt[is.na(L_region), `:=`(
+    L_region = "intergenic",
+    L_gene_id = ".",
+    L_gene_name = "None",
+    L_biotype = ""
+  )]
+
+  hybrids.dt[is.na(R_region), `:=`(
+    R_region = "intergenic",
+    R_gene_id = ".",
+    R_gene_name = "None",
+    R_biotype = ""
+  )]
+
 
   stopifnot(all(!is.na(c(hybrids.dt$L_region, hybrids.dt$R_region))))
   return(hybrids.dt)
-
 }

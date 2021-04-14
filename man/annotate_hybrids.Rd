@@ -2,16 +2,21 @@
 % Please edit documentation in R/annotate_hybrids.R
 \name{annotate_hybrids}
 \alias{annotate_hybrids}
-\title{Title}
+\title{Annotate hybrids using iCount regions file}
 \usage{
 annotate_hybrids(hybrids.dt, regions.gr)
 }
 \arguments{
-\item{regions.gr}{}
+\item{hybrids.dt}{Hybrids data.table}
+
+\item{regions.gr}{iCount regions.gtf file as GRanges}
 }
 \value{
-
+\code{hybrids.dt} annotated with \code{region}, \code{gene_id}, \code{gene_name} and \code{biotype} columns
 }
 \description{
-Title
+Annotate hybrids using iCount regions file
+}
+\examples{
+annotate_hybrids(hybrids.dt = clusters.hybrids.dt, regions.gr = regions.gtf)
 }
