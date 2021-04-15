@@ -104,7 +104,7 @@ convert_to_granges <- function(hybrids.dt, arm = c("L", "R"), genomic = FALSE) {
       return(R.gr)
     }
   } else if (genomic) {
-    if (!"_genomic_" %in% names(hybrids.dt)) stop("Genomic coordinates should have been calculated")
+    if (!any(grepl("_genomic_", names(hybrids.dt)))) stop("Genomic coordinates should have been calculated")
     if (arm == "L") {
       L.dt <- hybrids.dt[, grep("^R_", names(hybrids.dt), invert = TRUE), with = FALSE]
       setnames(L.dt, names(L.dt), gsub("^L_genomic_", "", names(L.dt)))
