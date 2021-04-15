@@ -161,7 +161,7 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
 #' @export
 
 collapse_clusters <- function(hybrids.dt) {
-  if(!"clusters" %in% names(hybrids.dt)) stop("No clusters in hybrids.dt")
+  if(!"cluster" %in% names(hybrids.dt)) stop("No clusters in hybrids.dt")
 
   clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)][cluster != ""][cluster != "."]
   clusters.dt[, `:=`(
