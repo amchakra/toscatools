@@ -89,7 +89,7 @@ convert_coordinates <- function(hybrids.dt, genes.gr) {
 export_genomic_bed <- function(hybrids.dt, filename, sam_tag = TRUE) {
   if (!all(hybrids.dt$L_seqnames == hybrids.dt$R_seqnames)) stop("Hybrids should all be intragenic")
   if (any(grepl("rRNA|rDNA", c(hybrids.dt$L_seqnames, hybrids.dt$R_seqnames)))) stop("Hybrids should not include rRNA")
-  if (!"_genomic_" %in% names(hybrids.dt)) stop("Genomic coordinates should have been calculated")
+  if (!any(grepl("_genomic_", names(hybrids.dt)))) stop("Genomic coordinates should have been calculated")
 
   coord.dt <- hybrids.dt[, `:=`(
     L.start = L_genomic_start,
