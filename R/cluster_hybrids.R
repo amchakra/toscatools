@@ -108,7 +108,14 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
   if (nrow(clusters.dt) == 0) clusters.dt[, name := character()] # In case there are no clusters
   setkey(clusters.dt, name)
   if (nrow(clusters.dt) != 0) stopifnot(any(!duplicated(clusters.dt$name))) # Make sure no hybrid is in more than one cluster, but only if there are clusters
-  clusters.dt[, cluster := paste0("C", cluster)]
+  clusters.dt[, tempcluster := paste0("C", cluster)][, cluster := NULL]
+
+  # Order cluster names by number of hybrids
+  clusters.order.dt <- clusters.dt[, .N, by = tempcluster]
+  setorder(clusters.order.dt, -N, tempcluster)[, cluster := paste0("C", 1:.N)]
+  setnames(clusters.order.dt, "N", "cluster_hybrid_count")
+  clusters.dt <- merge(clusters.dt, clusters.order.dt, by = "tempcluster")
+  clusters.dt[, tempcluster := NULL]
 
   # Merge back
   setkey(hybrids.dt, name)
