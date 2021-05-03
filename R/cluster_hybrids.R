@@ -112,7 +112,7 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
 
   # Order cluster names by number of hybrids
   clusters.order.dt <- clusters.dt[, .N, by = tempcluster]
-  setorder(clusters.order.dt, -N, tempcluster)[, cluster := paste0("C", 1:.N)]
+  setorder(clusters.order.dt, -N, tempcluster)[, cluster := paste0("C", stringr::str_pad(1:.N, width = 3, pad = 0))]
   setnames(clusters.order.dt, "N", "cluster_hybrid_count")
   clusters.dt <- merge(clusters.dt, clusters.order.dt, by = "tempcluster")
   clusters.dt[, tempcluster := NULL]
