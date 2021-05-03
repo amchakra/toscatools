@@ -135,24 +135,24 @@ export_genomic_bed <- function(hybrids.dt, filename, sam_tag = TRUE) {
 
   if (sam_tag == TRUE) {
     if ("sample" %in% names(coord.dt)) {
-      bed.dt$name <- paste0(bed.dt$name, "_", coord.dt$sample)
+      bed.dt$name <- paste0(bed.dt$name, "|", coord.dt$sample)
     } else {
-      bed.dt$name <- paste0(bed.dt$name, "_")
+      bed.dt$name <- paste0(bed.dt$name, "|")
     }
     if ("cluster" %in% names(coord.dt)) {
-      bed.dt$name <- paste0(bed.dt$name, "_", coord.dt$cluster)
+      bed.dt$name <- paste0(bed.dt$name, "|", coord.dt$cluster)
     } else {
-      bed.dt$name <- paste0(bed.dt$name, "_")
+      bed.dt$name <- paste0(bed.dt$name, "|")
     }
     if ("orientation" %in% names(coord.dt)) {
-      bed.dt$name <- paste0(bed.dt$name, "_", coord.dt$orientation)
+      bed.dt$name <- paste0(bed.dt$name, "|", coord.dt$orientation)
     } else {
-      bed.dt$name <- paste0(bed.dt$name, "_")
+      bed.dt$name <- paste0(bed.dt$name, "|")
     }
     if ("mfe" %in% names(coord.dt)) {
-      bed.dt$name <- paste0(bed.dt$name, "_", coord.dt$mfe)
+      bed.dt$name <- paste0(bed.dt$name, "|", coord.dt$mfe)
     } else {
-      bed.dt$name <- paste0(bed.dt$name, "_")
+      bed.dt$name <- paste0(bed.dt$name, "|")
     }
   }
 
