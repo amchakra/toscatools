@@ -167,10 +167,12 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
 #' @import data.table
 #' @export
 
-collapse_clusters <- function(hybrids.dt) {
+collapse_clusters <- function(hybrids.dt, mode = c("median", "wide")) {
   if(!"cluster" %in% names(hybrids.dt)) stop("No clusters in hybrids.dt")
 
   clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)][cluster != ""][cluster != "."]
+
+  if(mode == "median") {
   clusters.dt[, `:=`(
     L_cluster_start = floor(median(L_start)),
     L_cluster_end = ceiling(median(L_end)),
@@ -179,7 +181,16 @@ collapse_clusters <- function(hybrids.dt) {
   ),
   by = .(L_seqnames, R_seqnames, cluster)
   ]
-
+  } else if(mode == "wide") {
+    clusters.dt[, `:=`(
+      L_cluster_start = floor(min(L_start)),
+      L_cluster_end = ceiling(max(L_end)),
+      R_cluster_start = floor(min(R_start)),
+      R_cluster_end = ceiling(max(R_end))
+    ),
+    by = .(L_seqnames, R_seqnames, cluster)
+    ]
+  }
   clusters.dt[, count := .N, by = .(L_seqnames, R_seqnames, cluster)]
   clusters.dt <- unique(clusters.dt[, .(
     L_seqnames, L_cluster_start, L_cluster_end, L_strand,

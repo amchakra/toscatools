@@ -4,7 +4,7 @@
 \alias{collapse_clusters}
 \title{Collapse clusters}
 \usage{
-collapse_clusters(hybrids.dt)
+collapse_clusters(hybrids.dt, mode = c("median", "wide"))
 }
 \arguments{
 \item{hybrids.dt}{Hybrid data.table}
