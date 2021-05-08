@@ -78,6 +78,23 @@ annotate_hybrids <- function(hybrids.dt, regions.gr) {
   )]
 
   # ==========
+  # tRNA
+  # ==========
+
+  hybrids.dt[grep("tRNA", L_seqnames), `:=`(
+    L_gene_id = L_seqnames,
+    L_region = "tRNA",
+    L_gene_name = L_seqnames,
+    L_biotype = "tRNA"
+  )]
+  hybrids.dt[grep("tRNA", R_seqnames), `:=`(
+    R_gene_id = R_seqnames,
+    R_region = "tRNA",
+    R_gene_name = R_seqnames,
+    R_biotype = "tRNA"
+  )]
+
+  # ==========
   # Bug work-around for iCount missing a couple of intergenic regions
   # ==========
 

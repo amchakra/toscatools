@@ -6,8 +6,6 @@
 #'
 #' @return DNAStringSet of sequence
 #' @export
-#'
-#' @examples
 
 get_ncbi_sequence <- function(accession) {
 
