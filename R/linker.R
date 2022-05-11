@@ -1,9 +1,9 @@
 #' Title
 #'
-#' @param bam
-#' @param threads
-#' @param export_fasta
-#' @param fasta_filename
+#' @param bam BAM file
+#' @param threads Threads
+#' @param export_fasta Whether to export a FASTA/Q file
+#' @param fasta_filename FASTA/Q filename
 #'
 #' @return
 #' @export

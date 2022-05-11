@@ -12,7 +12,13 @@ convert_linkerbam_to_hybrids(
 )
 }
 \arguments{
-\item{fasta_filename}{}
+\item{bam}{BAM file}
+
+\item{threads}{Threads}
+
+\item{export_fasta}{Whether to export a FASTA/Q file}
+
+\item{fasta_filename}{FASTA/Q filename}
 }
 \value{
 

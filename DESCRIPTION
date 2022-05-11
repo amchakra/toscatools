@@ -1,10 +1,10 @@
-Package: primavera
+Package: toscatools
 Type: Package
-Title: hiCLIP analysis suite
-Version: 0.0.3
+Title: Tosca proximity ligation pipeline toolkit
+Version: 1.0.0
 Author: Anob Chakrabarti
 Maintainer: Anob Chakrabarti <anob.chakrabarti@crick.ac.uk>
-Description: This package contains functions to analyse hiCLIP data
+Description: This package contains functions used by Tosca to analyse proximity ligation sequencing data
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
