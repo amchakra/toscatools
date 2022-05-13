@@ -14,7 +14,7 @@
 #' @export
 
 find_hybrid_overlaps <- function(hybrids.dt, verbose = FALSE) {
-  hybrids.dt <- primavera::reorient_hybrids(hybrids.dt)
+  hybrids.dt <- toscatools::reorient_hybrids(hybrids.dt)
 
   # Create BEDPE and get overlaps
   bedpe.colnames <- c("L_seqnames", "L_start", "L_end", "R_seqnames", "R_start", "R_end", "name", "total_count", "L_strand", "R_strand")

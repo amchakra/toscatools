@@ -14,7 +14,7 @@ annotate_hybrids <- function(hybrids.dt, regions.gr) {
   # Left
   # ==========
 
-  L.gr <- primavera::convert_to_granges(hybrids.dt, arm = "L", genomic = TRUE)
+  L.gr <- toscatools::convert_to_granges(hybrids.dt, arm = "L", genomic = TRUE)
 
   # Sync seqlevels
   common.seqlevels <- unique(c(
@@ -39,7 +39,7 @@ annotate_hybrids <- function(hybrids.dt, regions.gr) {
   # Right
   # ==========
 
-  R.gr <- primavera::convert_to_granges(hybrids.dt, arm = "R", genomic = TRUE)
+  R.gr <- toscatools::convert_to_granges(hybrids.dt, arm = "R", genomic = TRUE)
 
   # Sync seqlevels
   common.seqlevels <- unique(c(

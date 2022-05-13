@@ -7,8 +7,6 @@
 #'
 #' @return
 #' @export
-#'
-#' @examples
 
 convert_linkerbam_to_hybrids <- function(bam, threads = 4, export_fasta = FALSE, fasta_filename) {
 
