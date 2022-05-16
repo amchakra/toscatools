@@ -45,7 +45,7 @@ get_sequence <- function(hybrids.dt, genome.dt) {
 #' @export
 
 shuffle_sequence <- function(sequence, number = 1, klet = 2, seed = 42) {
-  system(paste0("uShuffle -seed ", seed, " -k ", klet, " -n ", number, " -s ", sequence), intern = TRUE)
+  system(paste0("ushuffle -seed ", seed, " -k ", klet, " -n ", number, " -s ", sequence), intern = TRUE)
 }
 
 #' Analyses hybrid structure
