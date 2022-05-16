@@ -90,7 +90,11 @@ analyse_structure <- function(name, L_sequence, R_sequence) {
   # then l = "1,1" and r = "0,0"
 
   if (r == "0,0") {
-    db <- paste0(c(rep(".", l_width)), "&", c(rep(".", r_width)))
+
+    db <- paste0(paste0(c(rep(".", l_width)), collapse = ""),
+                 "&", 
+                 paste0(c(rep(".", r_width)), collapse = ""))
+                 
   } else {
 
     # Pad db with . according to from/to
