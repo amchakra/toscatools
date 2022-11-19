@@ -15,8 +15,6 @@ convert_coordinates <- function(hybrids.dt, genes.gr) {
   setkey(genes.dt, fasta_id)
   setkey(hybrids.dt, L_seqnames)
 
-  coord.dt <- merge(hybrids.dt, genes.dt, by.x = "L_seqnames", by.y = "fasta_id")
-
   # Do L
   setkey(hybrids.dt, L_seqnames)
   coord.dt <- merge(hybrids.dt, genes.dt, by.x = "L_seqnames", by.y = "fasta_id")
