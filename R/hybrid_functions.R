@@ -81,7 +81,7 @@ convert_to_datatable <- function(hybrids.grl) {
 #' @param hybrids.dt hybrids data.table
 #' @param arm Convert left or right arm
 #' @param genomic Use genomic coordinates
-#' @return
+#' @return GRanges of left or right hybrid arm
 #' @import data.table
 #' @export
 

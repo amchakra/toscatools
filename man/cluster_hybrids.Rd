@@ -4,7 +4,12 @@
 \alias{cluster_hybrids}
 \title{Cluster overlapping hybrids}
 \usage{
-cluster_hybrids(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
+cluster_hybrids(
+  hybrids.dt,
+  percent_overlap = 0.75,
+  fraction = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{percent_overlap}{Minimum percentage overlap for both left and right arms}
@@ -12,7 +17,7 @@ cluster_hybrids(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
 \item{hybrid.dt}{Hybrid data.table}
 }
 \value{
-
+Hybrid data.table with hybrids clustered
 }
 \description{
 Cluster overlapping hybrids using graph network analysis

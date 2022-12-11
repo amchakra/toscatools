@@ -14,7 +14,7 @@ convert_to_granges(hybrids.dt, arm = c("L", "R"), genomic = FALSE)
 \item{genomic}{Use genomic coordinates}
 }
 \value{
-
+GRanges of left or right hybrid arm
 }
 \description{
 Converts hybrids data.table to left or right arm GRanges, either using transcriptomic or genomic coordinates

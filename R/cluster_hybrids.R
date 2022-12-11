@@ -72,18 +72,95 @@ find_hybrid_overlaps <- function(hybrids.dt, verbose = FALSE) {
   return(bedpe.dt)
 }
 
+
+#' Find overlapping pairs of hybrids
+#'
+#' Uses \code{bedtools pairtopair} to get all overlaps with fractional overlaps and then calculates percentage overlaps based on overall span of overlapping left and right arms.
+#' Called by \code{cluster_hybrids}
+#'
+#' @param hybrids.dt Hybrids data.table
+#' @param verbose Print \code{bedtools} command
+#' @return bedpe.dt with left arm, right arm and mean percentage overlap calculated
+#' @import data.table
+#' @export
+
+find_hybrid_overlaps_fraction <- function(hybrids.dt, fraction_overlap, verbose = FALSE) {
+
+  hybrids.dt <- toscatools::reorient_hybrids(hybrids.dt)
+
+  # Create BEDPE and get overlaps
+  bedpe.colnames <- c("L_seqnames", "L_start", "L_end", "R_seqnames", "R_start", "R_end", "name", "total_count", "L_strand", "R_strand")
+  bedpe.dt <- hybrids.dt[, ..bedpe.colnames]
+  bedpe.dt[, `:=`(
+    L_start = L_start - 1,
+    R_start = R_start - 1
+  )]
+
+  bedpe <- tempfile(tmpdir = getwd(), fileext = ".bedpe")
+  ol <- tempfile(tmpdir = getwd(), fileext = ".bedpe")
+
+  fwrite(bedpe.dt, file = bedpe, sep = "\t", col.names = FALSE)
+  cmd <- paste("bedtools pairtopair -rdn -f", fraction_overlap, "-a", bedpe, "-b", bedpe, ">", ol)
+  if(verbose) message(cmd)
+  system(cmd)
+
+  # Check if there are no overlaps
+  if (file.size(ol) != 0) {
+    bedpe.dt <- fread(ol, col.names = c(paste0(bedpe.colnames, ".x"), paste0(bedpe.colnames, ".y")))
+    # Delete temporary files
+    # invisible(file.remove(bedpe))
+    # invisible(file.remove(ol))
+  } else {
+
+    # Delete temporary files
+    # invisible(file.remove(bedpe))
+    # invisible(file.remove(ol))
+    return(data.table())
+  }
+
+  # Get calculations and filter
+  bedpe.dt[, `:=`(
+    L_ol = min(L_end.x, L_end.y) - max(L_start.x, L_start.y) + 1,
+    R_ol = min(R_end.x, R_end.y) - max(R_start.x, R_start.y) + 1
+  ),
+  by = .(name.x, name.y)
+  ]
+
+  bedpe.dt[, `:=`(
+    L_sp = max(L_end.x, L_end.y) - min(L_start.x, L_start.y) + 1,
+    R_sp = max(R_end.x, R_end.y) - min(R_start.x, R_start.y) + 1
+  ),
+  by = .(name.x, name.y)
+  ]
+
+  bedpe.dt[, `:=`(
+    L_p = L_ol / L_sp,
+    R_p = R_ol / R_sp
+  ),
+  by = .(name.x, name.y)
+  ]
+
+  bedpe.dt[, mean_p := mean(c(L_p, R_p)), by = .(name.x, name.y)]
+  return(bedpe.dt)
+}
+
 #' Cluster overlapping hybrids
 #'
 #' Cluster overlapping hybrids using graph network analysis
 #'
 #' @param hybrid.dt Hybrid data.table
 #' @param percent_overlap Minimum percentage overlap for both left and right arms
-#' @return
+#' @return Hybrid data.table with hybrids clustered
 #' @import data.table
 #' @export
 
-cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE) {
-  hybrids.bedpe.dt <- find_hybrid_overlaps(hybrids.dt, verbose = verbose)
+cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, fraction = TRUE, verbose = FALSE) {
+
+  if(!fraction) {
+    hybrids.bedpe.dt <- find_hybrid_overlaps(hybrids.dt, verbose = verbose)
+  } else {
+    hybrids.bedpe.dt <- find_hybrid_overlaps_fraction(hybrids.dt, fraction_overlap = percent_overlap)
+  }
 
   if (nrow(hybrids.bedpe.dt) == 0) {
     return(hybrids.dt[, cluster := as.character(NA)])
@@ -125,6 +202,8 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, verbose = FALSE)
 
   return(hybrids.clustered.dt)
 }
+
+
 
 # #' Title
 # #'
