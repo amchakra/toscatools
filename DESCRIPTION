@@ -18,3 +18,7 @@ Import:
   S4Vectors,
   igraph,
   stringr
+LinkingTo: 
+    Rcpp
+Imports: 
+    Rcpp

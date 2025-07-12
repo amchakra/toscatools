@@ -9,7 +9,7 @@ bin_matrix_rect(matrix_data, bin_size)
 \arguments{
 \item{matrix_data}{The rectangular matrix to bin.}
 
-\item{bin_size}{The size of the bins. Default is 10.}
+\item{bin_size}{The size of the bins}
 }
 \value{
 A binned matrix.
