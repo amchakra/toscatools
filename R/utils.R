@@ -21,3 +21,4 @@ get_ncbi_sequence <- function(accession) {
   return(dss)
 
 }
+

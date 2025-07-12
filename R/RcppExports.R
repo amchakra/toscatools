@@ -13,6 +13,6 @@
 #'
 #' @export
 rcpp_get_contact_map <- function(hybrids, gene_A_size, gene_B_size) {
-    .Call('_toscatools_rcpp_get_contact_map', PACKAGE = 'toscatools', hybrids, gene_A_size, gene_B_size)
+    .Call(`_toscatools_rcpp_get_contact_map`, hybrids, gene_A_size, gene_B_size)
 }
 

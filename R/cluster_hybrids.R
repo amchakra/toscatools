@@ -158,6 +158,9 @@ find_hybrid_overlaps_fraction <- function(hybrids.dt, fraction_overlap, verbose 
 
 cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, cluster_method = "components", weight = FALSE, fraction = TRUE, verbose = FALSE) {
 
+  # Strip already assigned clusters and counts
+  hybrids.dt <- hybrids.dt[, grep("cluster", colnames(hybrids.dt), invert = TRUE), with = FALSE]
+
   if(!fraction) {
     hybrids.bedpe.dt <- find_hybrid_overlaps(hybrids.dt, verbose = verbose)
   } else {
@@ -216,7 +219,6 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, cluster_method =
 
   # Merge back
   setkey(hybrids.dt, name)
-  if ("cluster" %in% names(hybrids.dt)) hybrids.dt[, cluster := NULL] # if clusters already assigned, remove them
   hybrids.clustered.dt <- merge(hybrids.dt, clusters.dt, by = "name", all.x = TRUE)
   hybrids.clustered.dt[is.na(cluster), cluster := "."]
 
