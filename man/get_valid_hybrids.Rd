@@ -10,8 +10,7 @@ get_valid_hybrids(
   q_minoverlap = 4,
   q_maxgap = 4,
   s_minoverlap = 0,
-  xlink_distance = 5,
-  max_read_length = 100
+  xlink_distance = 1e+06
 )
 }
 \arguments{

@@ -97,7 +97,18 @@ calculate_blast8_metrics <- function(blast.dt) {
 #' @export
 #' @import data.table
 
-get_valid_hybrids <- function(blast.query.dt, min_unmapped_length = 16, q_minoverlap = 4, q_maxgap = 4, s_minoverlap = 0, xlink_distance = 5, max_read_length = 100) {
+get_valid_hybrids <- function(
+    blast.query.dt,
+    min_unmapped_length = 16,
+    q_minoverlap = 4,
+    q_maxgap = 4,
+    s_minoverlap = 0,
+    xlink_distance = 1000000) {
+
+  # Stop if the query is not unique
+  if (length(unique(blast.query.dt$query)) != 1) {
+    stop("Error: get_valid_hybrids must be applied per unique query. Found multiple or no queries.")
+  }
 
   # Keep best match for a given query region
   hybrids.dt <- blast.query.dt[evalue == min_evalue]
@@ -105,7 +116,7 @@ get_valid_hybrids <- function(blast.query.dt, min_unmapped_length = 16, q_minove
   # Match up with fasta read length and remove if enough of a continuous match for any hit
   # if(any(hybrids.dt$unmapped < (min_unmapped_length - q_minoverlap) & hybrids.dt$unmapped == 100)) {
   if (any(hybrids.dt$unmapped < (min_unmapped_length - q_minoverlap))) {
-    return(data.table())
+    return("strong_contiguous_match_to_a_single_gene") # the read has too little unmapped sequence
   } else {
 
     # Now get combinations
@@ -114,19 +125,32 @@ get_valid_hybrids <- function(blast.query.dt, min_unmapped_length = 16, q_minove
     hybrids.dt <- hybrids.dt[id.y > id.x] # Remove duplicates
     hybrids.dt[, id := paste0(id.x, "_", id.y)]
 
-    # Remove those with significant overlap in the query mappings and too large a gap between the query mappings
+    # Remove those with significant overlap in the query mappings
     hybrids.dt[, q_ol := min(q_end.x, q_end.y) - max(q_start.x, q_start.y) + 1, by = id]
-    hybrids.dt <- hybrids.dt[q_ol <= q_minoverlap][q_ol >= -q_maxgap]
-
+    hybrids.dt <- hybrids.dt[q_ol <= q_minoverlap]
+    if (nrow(hybrids.dt) == 0) {
+      return("excessive_overlap_in_query_mappings")
+    }
+    # Remove those with too large a gap between the query mappings
+    hybrids.dt <- hybrids.dt[q_ol >= -q_maxgap]
+    if (nrow(hybrids.dt) == 0) {
+      return("excessive_gap_between_query_mappings")
+    }
     # Remove those with significant overlap in the subject mappings, if subjects are the same
     hybrids.dt <- hybrids.dt[, s_ol := ifelse(subject.x == subject.y,
-      min(s_end.x, s_end.y) - max(s_start.x, s_start.y) + 1,
-      0
+                                              min(s_end.x, s_end.y) - max(s_start.x, s_start.y) + 1,
+                                              0
     ), by = id]
     hybrids.dt <- hybrids.dt[s_ol <= s_minoverlap]
+    if (nrow(hybrids.dt) == 0) {
+      return("excessive_overlap_in_subject_mappings")
+    }
 
-    # Remove those too far away from xlink position
-    hybrids.dt <- hybrids.dt[q_start.x < xlink_distance | q_start.y < xlink_distance]
+    # # Remove those too far away from xlink position
+    # hybrids.dt <- hybrids.dt[q_start.x < xlink_distance | q_start.y < xlink_distance]
+    # if (nrow(hybrids.dt) == 0) {
+    #     return("hybrids_too_far_from_xlink_site")
+    # }
 
     # Rename columns
     n <- names(hybrids.dt)
