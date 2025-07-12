@@ -7,6 +7,8 @@
 cluster_hybrids(
   hybrids.dt,
   percent_overlap = 0.75,
+  cluster_method = "components",
+  weight = FALSE,
   fraction = TRUE,
   verbose = FALSE
 )

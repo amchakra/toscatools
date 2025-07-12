@@ -106,15 +106,17 @@ find_hybrid_overlaps_fraction <- function(hybrids.dt, fraction_overlap, verbose 
 
   # Check if there are no overlaps
   if (file.size(ol) != 0) {
-    bedpe.dt <- fread(ol, col.names = c(paste0(bedpe.colnames, ".x"), paste0(bedpe.colnames, ".y")))
+    bedpe.dt <- fread(ol, sep = "\t", col.names = c(paste0(bedpe.colnames, ".x"), paste0(bedpe.colnames, ".y")))
+    # need to specify sep for cases where the sequence is:
+    # "tRNA-iMet-CAT-1-8;tRNA-iMet-CAT-1-7;tRNA-iMet-CAT-1-6;tRNA-iMet-CAT-1-5;tRNA-iMet-CAT-1-4;tRNA-iMet-CAT-1-3;tRNA-iMet-CAT-1-2;tRNA-iMet-CAT-1-1" as autodetected as ; separated
     # Delete temporary files
-    # invisible(file.remove(bedpe))
-    # invisible(file.remove(ol))
+    invisible(file.remove(bedpe))
+    invisible(file.remove(ol))
   } else {
 
     # Delete temporary files
-    # invisible(file.remove(bedpe))
-    # invisible(file.remove(ol))
+    invisible(file.remove(bedpe))
+    invisible(file.remove(ol))
     return(data.table())
   }
 
@@ -154,7 +156,7 @@ find_hybrid_overlaps_fraction <- function(hybrids.dt, fraction_overlap, verbose 
 #' @import data.table
 #' @export
 
-cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, fraction = TRUE, verbose = FALSE) {
+cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, cluster_method = "components", weight = FALSE, fraction = TRUE, verbose = FALSE) {
 
   if(!fraction) {
     hybrids.bedpe.dt <- find_hybrid_overlaps(hybrids.dt, verbose = verbose)
@@ -172,13 +174,31 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, fraction = TRUE,
   g <- igraph::graph_from_edgelist(el = as.matrix(sel.bedpe.dt[, .(name.x, name.y)]), directed = FALSE)
   igraph::E(g)$weight <- sel.bedpe.dt$mean_p # weight by percent overlap
 
-  c <- igraph::components(g)
-  if (verbose) message(c$no, " clusters")
+  if (cluster_method == "leiden") {
+    if(weight == TRUE) {
+      c <- igraph::cluster_leiden(g, objective_function = "modularity", weights = igraph::E(g)$weight)
+    } else {
+      c <- igraph::cluster_leiden(g, objective_function = "modularity", weights = NA)
+    }
+    cluster_membership <- igraph::membership(c)
+    if (verbose) message(length(unique(cluster_membership)), " Leiden clusters")
 
-  clusters.dt <- data.table(
-    name = names(c$membership),
-    cluster = c$membership
-  )
+  } else if (cluster_method == "louvain") {
+    if(weight == TRUE) {
+      c <- igraph::cluster_louvain(g, weights = igraph::E(g)$weight)
+    } else {
+      c <- igraph::cluster_louvain(g, weights = NA)
+    }
+    cluster_membership <- igraph::membership(c)
+    if (verbose) message(length(unique(cluster_membership)), " Louvain clusters")
+
+  } else if (cluster_method == "components") {
+    c <- igraph::components(g)
+    cluster_membership <- c$membership
+    if (verbose) message(c$no, " clusters")
+  }
+
+  clusters.dt <- data.table(name = names(cluster_membership), cluster = cluster_membership)
   setorder(clusters.dt, cluster)
 
   # Merge back
@@ -202,40 +222,6 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, fraction = TRUE,
 
   return(hybrids.clustered.dt)
 }
-
-
-
-# #' Title
-# #'
-# #' @param hybrids.dt
-# #'
-# #' @return
-# #' @export
-# #' @import data.table
-# #'
-# #' @examples
-
-# collapse_clusters <- function(hybrids.dt) {
-
-#   clusters.dt <- hybrids.dt[!is.na(cluster) & !is.infinite(cluster)][cluster != ""][cluster != "."]
-#   clusters.dt[, `:=` (L_cluster_start = floor(median(L_start)),
-#                       L_cluster_end = ceiling(median(L_end)),
-#                       R_cluster_start = floor(median(R_start)),
-#                       R_cluster_end = ceiling(median(R_end))),
-#               by = .(L_seqnames, R_seqnames, cluster)]
-
-#   clusters.dt[, count := .N, by = .(L_seqnames, R_seqnames, cluster)]
-#   clusters.dt <- unique(clusters.dt[, .(L_seqnames, L_cluster_start, L_cluster_end, L_strand,
-#                                         R_seqnames, R_cluster_start, R_cluster_end, R_strand,
-#                                         cluster, count)])
-
-#   setnames(clusters.dt,
-#            c("cluster", "L_cluster_start", "L_cluster_end", "R_cluster_start", "R_cluster_end"),
-#            c("name", "L_start", "L_end", "R_start", "R_end"))
-
-#   return(clusters.dt)
-
-# }
 
 #' Collapse clusters
 #'
