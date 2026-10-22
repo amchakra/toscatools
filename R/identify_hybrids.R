@@ -87,12 +87,13 @@ calculate_blast8_metrics <- function(blast.dt) {
 #'
 #' Calculate valid hybrids from Blat partial alignments
 #'
-#' @param blast8.query.dt blast8 data.table with read length and metrics
+#' @param blast.query.dt blast8 data.table with read length and metrics, for a single query
 #' @param min_unmapped_length Minimum unmapped read length
 #' @param q_minoverlap Maximum overlap in left and right query arms
 #' @param q_maxgap Maximum gap between left and right query arms
 #' @param s_minoverlap Minimum overlap in left and right subject arms
-#' @param xlink_distance Maximum distance from start of the read (i.e. crosslink + 1 nt) before left arm starts
+#' @param xlink_distance Maximum distance from start of the read (i.e. crosslink + 1 nt) before left arm starts.
+#'   Currently unused: the crosslink-distance filter is disabled.
 #' @return Hybrids data.table
 #' @export
 #' @import data.table

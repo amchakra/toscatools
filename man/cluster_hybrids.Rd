@@ -14,9 +14,18 @@ cluster_hybrids(
 )
 }
 \arguments{
+\item{hybrids.dt}{Hybrids data.table}
+
 \item{percent_overlap}{Minimum percentage overlap for both left and right arms}
 
-\item{hybrid.dt}{Hybrid data.table}
+\item{cluster_method}{Graph clustering method: \code{"components"} (connected components), \code{"leiden"} or \code{"louvain"}}
+
+\item{weight}{Weight graph edges by mean percentage overlap (Leiden and Louvain only)}
+
+\item{fraction}{Pre-filter overlaps with \code{bedtools pairtopair -f percent_overlap}
+(\code{find_hybrid_overlaps_fraction}); \code{FALSE} uses \code{find_hybrid_overlaps}}
+
+\item{verbose}{Print progress messages}
 }
 \value{
 Hybrid data.table with hybrids clustered

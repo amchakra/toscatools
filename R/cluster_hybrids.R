@@ -79,6 +79,7 @@ find_hybrid_overlaps <- function(hybrids.dt, verbose = FALSE) {
 #' Called by \code{cluster_hybrids}
 #'
 #' @param hybrids.dt Hybrids data.table
+#' @param fraction_overlap Minimum overlap as a fraction of each arm, passed to \code{bedtools pairtopair -f}
 #' @param verbose Print \code{bedtools} command
 #' @return bedpe.dt with left arm, right arm and mean percentage overlap calculated
 #' @import data.table
@@ -150,8 +151,13 @@ find_hybrid_overlaps_fraction <- function(hybrids.dt, fraction_overlap, verbose 
 #'
 #' Cluster overlapping hybrids using graph network analysis
 #'
-#' @param hybrid.dt Hybrid data.table
+#' @param hybrids.dt Hybrids data.table
 #' @param percent_overlap Minimum percentage overlap for both left and right arms
+#' @param cluster_method Graph clustering method: \code{"components"} (connected components), \code{"leiden"} or \code{"louvain"}
+#' @param weight Weight graph edges by mean percentage overlap (Leiden and Louvain only)
+#' @param fraction Pre-filter overlaps with \code{bedtools pairtopair -f percent_overlap}
+#'   (\code{find_hybrid_overlaps_fraction}); \code{FALSE} uses \code{find_hybrid_overlaps}
+#' @param verbose Print progress messages
 #' @return Hybrid data.table with hybrids clustered
 #' @import data.table
 #' @export
@@ -230,6 +236,7 @@ cluster_hybrids <- function(hybrids.dt, percent_overlap = 0.75, cluster_method =
 #' Collapse overlapping clusters of hybrids into a representative duplex
 #'
 #' @param hybrids.dt Hybrid data.table
+#' @param mode \code{"median"} (median arm starts and ends) or \code{"wide"} (outermost arm starts and ends)
 #' @return Clusters data.table
 #' @import data.table
 #' @export
