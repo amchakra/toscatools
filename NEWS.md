@@ -1,4 +1,4 @@
-# toscatools 1.0.0.9001
+# toscatools 1.0.0.9002
 
 Development version, to be released as 2.0.0. Changes since 1.0.0:
 
@@ -18,7 +18,10 @@ Development version, to be released as 2.0.0. Changes since 1.0.0:
 * Removed `convert_linkerbam_to_hybrids()`.
 * `get_valid_hybrids()` returns a character discard reason, not an empty `data.table()`, when a read
   yields no valid hybrid. It stops if given more than one query. `max_read_length` (unused) is removed.
-  The `xlink_distance` default is now `1e6`, and the crosslink-distance filter is disabled.
+* `get_valid_hybrids()`'s crosslink-distance filter is now **off by default** (`xlink_distance = NULL`;
+  it was 5 in 1.0.0). Set `xlink_distance = 5` for hiCLIP and other iCLIP-style libraries, whose read 5'
+  end is the crosslink: a pair is kept only if one arm starts at read position 1-4. Leave it off for
+  SPLASH, PARIS or COMRADES. Pairs it removes are reported as `"hybrids_too_far_from_xlink_site"`.
 * `cluster_hybrids()` gains `cluster_method` (`"components"`, `"leiden"`, `"louvain"`), `weight` and
   `fraction`. The default `fraction = TRUE` uses `bedtools pairtopair -f`
   (`find_hybrid_overlaps_fraction()`), which changes clustering relative to 1.0.0. Pass
