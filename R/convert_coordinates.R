@@ -2,9 +2,15 @@
 #'
 #' Convert from transcriptomic to genomic coordinates
 #'
+#' Each Tosca reference sequence (\code{fasta_id}) is the unspliced genomic span of a gene, in the gene's
+#' sense, so the mapping is linear. All coordinates are 1-based and closed. A transcript position \code{p}
+#' maps to genomic \code{start + p - 1} on the plus strand and to \code{end - p + 1} on the minus strand,
+#' so an arm \code{[s, e]} on a minus-strand gene spans genomic \code{[end - e + 1, end - s + 1]}.
+#' Versions up to 1.0.0 omitted the \code{+ 1} on the minus strand, placing those arms 1 nt too low.
+#'
 #' @param hybrids.dt Hybrids data.table
-#' @param genes.gr Transcript gtf as GRanges
-#' @return \code{hybrids.dt} with genomic coordinates in \code{[L|R]_genomic_*} columns
+#' @param genes.gr Transcript gtf as GRanges, with a \code{fasta_id} column naming each reference sequence
+#' @return \code{hybrids.dt} with integer genomic coordinates in \code{[L|R]_genomic_*} columns
 #' @export
 #' @import data.table
 
@@ -21,16 +27,16 @@ convert_coordinates <- function(hybrids.dt, genes.gr) {
 
   coord.dt[strand == "+", `:=`(
     L_genomic_seqnames = seqnames,
-    L_genomic_start = L_start + start - 1,
-    L_genomic_end = L_end + start - 1,
+    L_genomic_start = L_start + start - 1L,
+    L_genomic_end = L_end + start - 1L,
     L_genomic_strand = "+"
   ),
   by = name
   ]
   coord.dt[strand == "-", `:=`(
     L_genomic_seqnames = seqnames,
-    L_genomic_start = end - L_end,
-    L_genomic_end = end - L_start,
+    L_genomic_start = end - L_end + 1L,
+    L_genomic_end = end - L_start + 1L,
     L_genomic_strand = "-"
   ),
   by = name
@@ -43,16 +49,16 @@ convert_coordinates <- function(hybrids.dt, genes.gr) {
 
   coord.dt[strand == "+", `:=`(
     R_genomic_seqnames = seqnames,
-    R_genomic_start = R_start + start - 1,
-    R_genomic_end = R_end + start - 1,
+    R_genomic_start = R_start + start - 1L,
+    R_genomic_end = R_end + start - 1L,
     R_genomic_strand = "+"
   ),
   by = name
   ]
   coord.dt[strand == "-", `:=`(
     R_genomic_seqnames = seqnames,
-    R_genomic_start = end - R_end,
-    R_genomic_end = end - R_start,
+    R_genomic_start = end - R_end + 1L,
+    R_genomic_end = end - R_start + 1L,
     R_genomic_strand = "-"
   ),
   by = name
