@@ -1,24 +1,26 @@
 Package: toscatools
 Type: Package
 Title: Tosca proximity ligation pipeline toolkit
-Version: 1.1.0
+Version: 1.0.0.9001
 Author: Anob Chakrabarti
 Maintainer: Anob Chakrabarti <anob.chakrabarti@crick.ac.uk>
-Description: This package contains functions used by Tosca to analyse proximity ligation sequencing data
-License: What license is it under?
+Description: Functions used by the Tosca pipeline to analyse proximity ligation sequencing data.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.2
-Import:
-  data.table,
-  Biostrings,
-  BiocGenerics,
-  GenomeInfoDb,
-  GenomicRanges,  
-  S4Vectors,
-  igraph,
-  stringr
-LinkingTo: 
-    Rcpp
-Imports: 
-    Rcpp
+RoxygenNote: 7.3.3
+Imports:
+    data.table,
+    Biostrings,
+    BiocGenerics,
+    GenomeInfoDb,
+    GenomicRanges,
+    S4Vectors,
+    igraph,
+    stringr
+Suggests:
+    IRanges,
+    rentrez,
+    testthat (>= 3.0.0)
+SystemRequirements: bedtools, ViennaRNA (RNAduplex), ushuffle
+Config/testthat/edition: 3

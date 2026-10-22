@@ -14,6 +14,8 @@ get_valid_hybrids(
 )
 }
 \arguments{
+\item{blast.query.dt}{blast8 data.table with read length and metrics, for a single query}
+
 \item{min_unmapped_length}{Minimum unmapped read length}
 
 \item{q_minoverlap}{Maximum overlap in left and right query arms}
@@ -22,9 +24,8 @@ get_valid_hybrids(
 
 \item{s_minoverlap}{Minimum overlap in left and right subject arms}
 
-\item{xlink_distance}{Maximum distance from start of the read (i.e. crosslink + 1 nt) before left arm starts}
-
-\item{blast8.query.dt}{blast8 data.table with read length and metrics}
+\item{xlink_distance}{Maximum distance from start of the read (i.e. crosslink + 1 nt) before left arm starts.
+Currently unused: the crosslink-distance filter is disabled.}
 }
 \value{
 Hybrids data.table

@@ -8,6 +8,8 @@ collapse_clusters(hybrids.dt, mode = c("median", "wide"))
 }
 \arguments{
 \item{hybrids.dt}{Hybrid data.table}
+
+\item{mode}{\code{"median"} (median arm starts and ends) or \code{"wide"} (outermost arm starts and ends)}
 }
 \value{
 Clusters data.table

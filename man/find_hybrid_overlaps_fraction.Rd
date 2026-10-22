@@ -9,6 +9,8 @@ find_hybrid_overlaps_fraction(hybrids.dt, fraction_overlap, verbose = FALSE)
 \arguments{
 \item{hybrids.dt}{Hybrids data.table}
 
+\item{fraction_overlap}{Minimum overlap as a fraction of each arm, passed to \code{bedtools pairtopair -f}}
+
 \item{verbose}{Print \code{bedtools} command}
 }
 \value{
