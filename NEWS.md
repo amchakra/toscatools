@@ -1,6 +1,8 @@
-# toscatools 1.0.0.9002
+# toscatools 1.1.0.9001
 
-Development version, to be released as 2.0.0. Changes since 1.0.0:
+Development version, to be released as 2.0.0. Changes since 1.0.0 (the `dev` branch had been versioned
+1.1.0 before these changes without a release; the development version is numbered above it so that
+version comparisons order correctly):
 
 ## Bug fixes
 
