@@ -10,7 +10,7 @@ get_valid_hybrids(
   q_minoverlap = 4,
   q_maxgap = 4,
   s_minoverlap = 0,
-  xlink_distance = 1e+06
+  xlink_distance = NULL
 )
 }
 \arguments{
@@ -24,11 +24,14 @@ get_valid_hybrids(
 
 \item{s_minoverlap}{Minimum overlap in left and right subject arms}
 
-\item{xlink_distance}{Maximum distance from start of the read (i.e. crosslink + 1 nt) before left arm starts.
-Currently unused: the crosslink-distance filter is disabled.}
+\item{xlink_distance}{Crosslink-distance filter, for protocols whose read 5' end marks the crosslink site
+(hiCLIP and other iCLIP-style libraries, where the read starts at crosslink + 1). When set, a pair is kept
+only if one arm starts before this read position (1-based), i.e. \code{q_start < xlink_distance};
+5 keeps arms starting at read positions 1-4. \code{NULL}, \code{NA} or \code{Inf} (the default is
+\code{NULL}) switches the filter off, as for SPLASH, PARIS or COMRADES libraries.}
 }
 \value{
-Hybrids data.table
+Hybrids data.table, or a character discard reason if no valid hybrid remains
 }
 \description{
 Calculate valid hybrids from Blat partial alignments

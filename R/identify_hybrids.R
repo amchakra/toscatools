@@ -92,9 +92,12 @@ calculate_blast8_metrics <- function(blast.dt) {
 #' @param q_minoverlap Maximum overlap in left and right query arms
 #' @param q_maxgap Maximum gap between left and right query arms
 #' @param s_minoverlap Minimum overlap in left and right subject arms
-#' @param xlink_distance Maximum distance from start of the read (i.e. crosslink + 1 nt) before left arm starts.
-#'   Currently unused: the crosslink-distance filter is disabled.
-#' @return Hybrids data.table
+#' @param xlink_distance Crosslink-distance filter, for protocols whose read 5' end marks the crosslink site
+#'   (hiCLIP and other iCLIP-style libraries, where the read starts at crosslink + 1). When set, a pair is kept
+#'   only if one arm starts before this read position (1-based), i.e. \code{q_start < xlink_distance};
+#'   5 keeps arms starting at read positions 1-4. \code{NULL}, \code{NA} or \code{Inf} (the default is
+#'   \code{NULL}) switches the filter off, as for SPLASH, PARIS or COMRADES libraries.
+#' @return Hybrids data.table, or a character discard reason if no valid hybrid remains
 #' @export
 #' @import data.table
 
@@ -104,7 +107,7 @@ get_valid_hybrids <- function(
     q_minoverlap = 4,
     q_maxgap = 4,
     s_minoverlap = 0,
-    xlink_distance = 1000000) {
+    xlink_distance = NULL) {
 
   # Stop if the query is not unique
   if (length(unique(blast.query.dt$query)) != 1) {
@@ -147,11 +150,13 @@ get_valid_hybrids <- function(
       return("excessive_overlap_in_subject_mappings")
     }
 
-    # # Remove those too far away from xlink position
-    # hybrids.dt <- hybrids.dt[q_start.x < xlink_distance | q_start.y < xlink_distance]
-    # if (nrow(hybrids.dt) == 0) {
-    #     return("hybrids_too_far_from_xlink_site")
-    # }
+    # Remove those too far away from the crosslink position (only when the filter is switched on)
+    if (!is.null(xlink_distance) && is.finite(xlink_distance)) {
+      hybrids.dt <- hybrids.dt[q_start.x < xlink_distance | q_start.y < xlink_distance]
+      if (nrow(hybrids.dt) == 0) {
+        return("hybrids_too_far_from_xlink_site")
+      }
+    }
 
     # Rename columns
     n <- names(hybrids.dt)

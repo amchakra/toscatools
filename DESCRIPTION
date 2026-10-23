@@ -1,7 +1,7 @@
 Package: toscatools
 Type: Package
 Title: Tosca proximity ligation pipeline toolkit
-Version: 1.0.0.9001
+Version: 1.0.0.9002
 Author: Anob Chakrabarti
 Maintainer: Anob Chakrabarti <anob.chakrabarti@crick.ac.uk>
 Description: Functions used by the Tosca pipeline to analyse proximity ligation sequencing data.
