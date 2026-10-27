@@ -1,3 +1,13 @@
+# toscatools 1.1.0.9002
+
+## New features
+
+* `annotate_hybrids()` labels more non-genomic reference entries (entries with no genome coordinates) in
+  the same way as rRNA and tRNA: `gene_id` and `gene_name` are the entry name, and `region` and
+  `biotype` are its class. `^snRNA_` -> `snRNA`, `^7SK$` -> `7SK`, `^7SL$` -> `7SL`, `^YRNA_` -> `Y_RNA` and `^chrM$` (the
+  mitochondrial genome as one entry) -> `Mt`. Before, these entries were not special-cased, so their
+  arms were usually called `intergenic` with gene `None`. rRNA and tRNA labelling is unchanged.
+
 # toscatools 1.1.0.9001
 
 Development version, to be released as 2.0.0. Changes since 1.0.0 (the `dev` branch had been versioned
