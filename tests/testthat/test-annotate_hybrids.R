@@ -1,4 +1,4 @@
-# Toy hybrids with genomic columns already computed. Non-gene reference entries have no genome
+# Toy hybrids with genomic columns already computed. Non-genomic reference entries have no genome
 # coordinates: their "genomic" seqname is the entry itself and coordinates are entry-relative.
 make_annotation_fixture <- function() {
   entries <- c("geneA", "rRNA_45S", "rDNA", "rRNA_5S", "tRNA-Gly-GCC",
@@ -40,7 +40,7 @@ expected_class <- c(
   "YRNA_Y1" = "Y_RNA", "chrM" = "Mt"
 )
 
-test_that("non-gene entries are labelled by class with the entry name as gene", {
+test_that("non-genomic entries are labelled by class with the entry name as gene", {
   f <- make_annotation_fixture()
   out <- annotate_hybrids(data.table::copy(f$hybrids.dt), f$regions.gr)
   expect_equal(nrow(out), nrow(f$hybrids.dt))
@@ -66,7 +66,7 @@ test_that("a gene arm keeps its regions annotation", {
                    c("UTR5", "ENSG_A", "geneA", "protein_coding"))
 })
 
-test_that("no arm is left unannotated and no non-gene entry is called intergenic", {
+test_that("no arm is left unannotated and no non-genomic entry is called intergenic", {
   f <- make_annotation_fixture()
   out <- annotate_hybrids(data.table::copy(f$hybrids.dt), f$regions.gr)
   expect_false(anyNA(c(out$L_region, out$R_region)))
